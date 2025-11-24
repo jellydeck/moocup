@@ -404,7 +404,7 @@ export function Navbar() {
     <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
       <div className="flex items-center justify-between px-4 h-16 lg:mx-40">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <h1 className="text-xl font-bold text-primary">Moo</h1>
             <a
               href="https://ko-fi.com/jaydipsanghani"
