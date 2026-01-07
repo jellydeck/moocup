@@ -16,16 +16,18 @@ import {
   Coffee,
   ExternalLink,
   Loader2,
-  QrCode,
   Heart,
-  Twitter,
   X,
   CheckCircle,
-  Github,
 } from "lucide-react";
+import { Github } from "@/components/icons/Github";
+import { Bluesky } from "@/components/icons/Bluesky";
+import { X as XIcon } from "@/components/icons/X";
+
 import { toast } from "sonner";
 import { useMockupStore } from "@/contexts/MockupContext";
 import html2canvas from "html2canvas";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export function Navbar() {
   const [showExportOptions, setShowExportOptions] = useState(false);
@@ -36,8 +38,7 @@ export function Navbar() {
 
   const { uploadedImage, imageBorder, fixedMargin, margin } = useMockupStore();
 
-  const isMobile =
-    typeof window !== "undefined" ? window.innerWidth < 768 : false;
+  const isMobile = typeof window !== "undefined" ? window.innerWidth < 768 : false;
 
   const getQualityLabel = (value) => {
     switch (value) {
@@ -56,9 +57,7 @@ export function Navbar() {
     if (!uploadedImage) return;
 
     try {
-      const mockupElement = document.querySelector(
-        "[data-mockup-canvas]",
-      ) as HTMLDivElement;
+      const mockupElement = document.querySelector("[data-mockup-canvas]") as HTMLDivElement;
       if (!mockupElement) throw new Error("Mockup canvas not found");
 
       const imgElement = mockupElement.querySelector("img") as HTMLImageElement;
@@ -130,16 +129,11 @@ export function Navbar() {
     const qualityMultiplier = quality[0];
 
     try {
-      await Promise.all(
-        formats.map((format) => exportImage(format, qualityMultiplier)),
-      );
+      await Promise.all(formats.map((format) => exportImage(format, qualityMultiplier)));
 
-      toast.success(
-        `Successfully exported all formats (${formats.join(", ")})!`,
-        {
-          icon: <CheckCircle className="w-4 h-4" />,
-        },
-      );
+      toast.success(`Successfully exported all formats (${formats.join(", ")})!`, {
+        icon: <CheckCircle className="w-4 h-4" />,
+      });
     } catch (error) {
       console.error("Export all formats error:", error);
       toast.error("Failed to export some formats. Please try again.");
@@ -259,7 +253,7 @@ export function Navbar() {
             rel="noopener noreferrer"
             className="inline-flex gap-2 w-full grid-cols-2"
           >
-            <Github />
+            <Github className="size-5" />
             Hey, You can also help us out at here
           </a>
         </Button>
@@ -320,9 +314,7 @@ export function Navbar() {
               </DialogTrigger>
               <DialogContent className="max-w-xs">
                 <DialogHeader>
-                  <DialogTitle className="text-center">
-                    Thanks so much!
-                  </DialogTitle>
+                  <DialogTitle className="text-center">Thanks for contribution!</DialogTitle>
                 </DialogHeader>
                 <div className="flex flex-col items-center gap-4 py-4">
                   <div className="w-48 h-48 bg-muted rounded-xl flex items-center justify-center border-2 border-dashed border-muted-foreground/20">
@@ -333,9 +325,7 @@ export function Navbar() {
                       alt="QR code for making payment in Indian Rupees"
                     />
                   </div>
-                  <p className="text-sm text-muted-foreground text-center">
-                    Scan with any UPI app
-                  </p>
+                  <p className="text-sm text-muted-foreground text-center">Scan with any UPI app</p>
                 </div>
               </DialogContent>
             </Dialog>
@@ -360,20 +350,7 @@ export function Navbar() {
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className="w-4 h-4"
-                  >
-                    <path
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 10Q2-2 2 6t5 8q-5 3-1 6t6-3q2 6 6 3t-1-6q5 0 5-8t-10 4"
-                    />
-                  </svg>
+                  <Bluesky className="size-4" />
                   <span>Bluesky</span>
                 </a>
               </Button>
@@ -384,12 +361,12 @@ export function Navbar() {
                 className="flex-1 border-primary/30 hover:border-primary/50"
               >
                 <a
-                  href="https://twitter.com/JellyDeck"
+                  href="https://x.com/JellyDeck"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
                 >
-                  <Twitter className="w-4 h-4" />
+                  <XIcon className="size-4" />
                   <span>Twitter</span>
                 </a>
               </Button>
@@ -418,11 +395,7 @@ export function Navbar() {
           {!isMobile && (
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>crafted by</span>
-              <Button
-                variant="link"
-                className="h-auto p-0 text-primary"
-                asChild
-              >
+              <Button variant="link" className="h-auto p-0 text-primary" asChild>
                 <a
                   href="https://jaydip.me"
                   target="_blank"
@@ -436,59 +409,22 @@ export function Navbar() {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <a
-            href="https://github.com/jellydeck/moocup"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="https://github.com/jellydeck/moocup" target="_blank" rel="noopener noreferrer">
             <Button variant="outline" className="gap-2 mr-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                stroke="#000"
-                viewBox="0 0 20 20"
-              >
-                <g id="SVGRepo_iconCarrier">
-                  <g
-                    id="Page-1"
-                    fill="none"
-                    fillRule="evenodd"
-                    stroke="none"
-                    strokeWidth="1"
-                  >
-                    <g
-                      id="Dribbble-Light-Preview"
-                      fill="#99d28e"
-                      transform="translate(-140 -7559)"
-                    >
-                      <g id="icons" transform="translate(56 160)">
-                        <path
-                          id="github-[#99d28e142]"
-                          d="M94 7399c5.523 0 10 4.59 10 10.253 0 4.529-2.862 8.371-6.833 9.728-.507.101-.687-.219-.687-.492 0-.338.012-1.442.012-2.814 0-.956-.32-1.58-.679-1.898 2.227-.254 4.567-1.121 4.567-5.059 0-1.12-.388-2.034-1.03-2.752.104-.259.447-1.302-.098-2.714 0 0-.838-.275-2.747 1.051a9.4 9.4 0 0 0-2.505-.345 9.4 9.4 0 0 0-2.503.345c-1.911-1.326-2.751-1.051-2.751-1.051-.543 1.412-.2 2.455-.097 2.714-.639.718-1.03 1.632-1.03 2.752 0 3.928 2.335 4.808 4.556 5.067-.286.256-.545.708-.635 1.371-.57.262-2.018.715-2.91-.852 0 0-.529-.985-1.533-1.057 0 0-.975-.013-.068.623 0 0 .655.315 1.11 1.5 0 0 .587 1.83 3.369 1.21.005.857.014 1.665.014 1.909 0 .271-.184.588-.683.493-3.974-1.355-6.839-5.199-6.839-9.729 0-5.663 4.478-10.253 10-10.253"
-                        ></path>
-                      </g>
-                    </g>
-                  </g>
-                </g>
-              </svg>
+              <Github className="size-5" />
               Send us a star!
             </Button>
           </a>
           {isMobile ? (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button
-                  size="icon"
-                  disabled={!uploadedImage}
-                  className="h-10 w-10"
-                >
+                <Button size="icon" disabled={!uploadedImage} className="h-10 w-10">
                   <Download className="w-5 h-5" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="w-[95vw] max-w-md h-[90vh] max-h-[90vh] flex flex-col p-0 [&>button:first-of-type]:hidden">
                 <div className="flex items-center justify-between p-4 border-b shrink-0">
-                  <DialogTitle className="text-lg font-semibold">
-                    Export & Support
-                  </DialogTitle>
+                  <DialogTitle className="text-lg font-semibold">Export & Support</DialogTitle>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -506,27 +442,27 @@ export function Navbar() {
               </DialogContent>
             </Dialog>
           ) : (
-            <div className="relative">
-              <Button
-                variant="outline"
-                onClick={() => setShowExportOptions(!showExportOptions)}
-                disabled={!uploadedImage}
-                className="gap-2"
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" disabled={!uploadedImage} className="gap-2 group">
+                  <Download className="w-4 h-4" />
+                  Export
+                  <ChevronDown className="size-4 transition-transform group-data-[state=open]:rotate-180" />
+                </Button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                align="end"
+                side="bottom"
+                className="w-[900px] p-0.5 border rounded-2xl mt-1.5"
               >
-                <Download className="w-4 h-4" />
-                Export
-                <ChevronDown
-                  className={`w-4 h-4 transition-transform ${showExportOptions ? "rotate-180" : ""}`}
-                />
-              </Button>
-              {showExportOptions && (
-                <Card className="absolute right-0 top-full mt-2 w-[900px] shadow-lg z-50 bg-background border rounded-2xl">
+                <Card className="shadow-none border-0">
                   <CardContent className="p-6">
                     <ExportOptionsContent />
                   </CardContent>
                 </Card>
-              )}
-            </div>
+              </PopoverContent>
+            </Popover>
           )}
         </div>
       </div>
