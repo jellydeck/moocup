@@ -2,12 +2,15 @@
 @import 'tailwindcss';
 
 :root {
-	--bg: oklch(0.979 0.004 360);
-	--text: oklch(0.291 0.006 301.2);
-	--accent: oklch(0.663 0.22 28.2);
-	--peach: oklch(0.38 0.133 8.5);
-	--border: oklch(0.663 0.195 28.2 / 0.3);
-	--highlight: oklch(0.439 0.144 27.5);
+	--bg: #100d0b;
+	--text: #f6eae4;
+	--accent: #e8cff1;
+
+	--pine: #262913;
+	--pine-text: #6e803b;
+
+	--white: #f3efef;
+	--border: #232b21;
 
 	--mono: 0; /* Monospace: Sans (natural-width) or Mono (fixed-width) */
 	--casl: 0; /* Casual: Linear to Casual */
@@ -17,9 +20,12 @@
 	--color-bg: var(--bg);
 	--color-text: var(--text);
 	--color-accent: var(--accent);
-	--color-peach: var(--peach);
-	/*--color-border: var(--border);*/
-	/*--color-highlight: var(--highlight);*/
+
+	--color-pine: var(--pine);
+	--color-pine-text: var(--pine-text);
+
+	--color-white: var(--white);
+	--color-border: var(--border);
 }
 
 * {

@@ -78,22 +78,22 @@
 		}
 	}
 
-	async function handleAllFormatsExport() {
-		if (!uploadedImage) {
-			toast.error('Please upload an image first');
-			return;
-		}
-		isExporting = true;
-		const formats = ['PNG', 'JPEG', 'WebP'];
-		try {
-			await Promise.all(formats.map((f) => exportImage(f, parseInt(quality))));
-			toast.success(`Successfully exported all formats (${formats.join(', ')})!`);
-		} catch {
-			toast.error('Failed to export some formats. Please try again.');
-		} finally {
-			isExporting = false;
-		}
-	}
+	// async function handleAllFormatsExport() {
+	// 	if (!uploadedImage) {
+	// 		toast.error('Please upload an image first');
+	// 		return;
+	// 	}
+	// 	isExporting = true;
+	// 	const formats = ['PNG', 'JPEG', 'WebP'];
+	// 	try {
+	// 		await Promise.all(formats.map((f) => exportImage(f, parseInt(quality))));
+	// 		toast.success(`Successfully exported all formats (${formats.join(', ')})!`);
+	// 	} catch {
+	// 		toast.error('Failed to export some formats. Please try again.');
+	// 	} finally {
+	// 		isExporting = false;
+	// 	}
+	// }
 </script>
 
 <!-- ─── Export Panel Snippet ──────────────────────────────── -->
@@ -154,13 +154,13 @@
 					{/if}
 				</Button>
 
-				<Button onclick={handleAllFormatsExport} disabled={isExporting || !uploadedImage}>
+				<!-- <Button onclick={handleAllFormatsExport} disabled={isExporting || !uploadedImage}>
 					{#if isExporting}
 						<SpinnerGapIcon size={20} class="animate-spin" /> Exporting All...
 					{:else}
 						<DownloadSimpleIcon size={20} /> Export All Formats
 					{/if}
-				</Button>
+				</Button> -->
 			</div>
 
 			<a
@@ -297,12 +297,12 @@
 {/snippet}
 
 <!-- ─── Navbar ─────────────────────────────────────────────── -->
-<div class="bg-background/80 sticky top-0 z-50 border-b backdrop-blur-lg">
+<div class="bg-background/80 sticky top-0 z-50 border-b border-border">
 	<div class="flex h-16 items-center justify-between px-4 lg:mx-40">
 		<!-- Logo -->
 		<div class="flex items-center gap-4">
 			<div class="flex items-center">
-				<h1 class="text-primary text-xl font-bold">Moo</h1>
+				<!-- <h1 class="text-primary text-xl font-bold">Moo</h1> -->
 				<a href="https://ko-fi.com/jaydipsanghani" target="_blank" rel="noopener noreferrer">
 					<CoffeeIcon
 						size={24}
@@ -366,21 +366,19 @@
 			{:else}
 				<!-- Desktop: Popover -->
 				<Popover.Root>
-					<Popover.Trigger disabled={!uploadedImage}>
-						<Button>
-							Export
-							<CaretDownIcon
-								size={16}
-								weight="bold"
-								class="ms-2 transition-transform group-data-[state=open]:rotate-180"
-							/>
-						</Button>
+					<Popover.Trigger>
+						{#snippet child({ props })}
+							<Button {...props} disabled={!uploadedImage}>
+								Export
+								<CaretDownIcon size={16} weight="bold" class="ms-2" />
+							</Button>
+						{/snippet}
 					</Popover.Trigger>
 					<Popover.Portal>
 						<Popover.Content
 							align="end"
 							sideOffset={6}
-							class="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 z-50 w-[900px] rounded-2xl border p-6 shadow-lg outline-none"
+							class="bg-background z-50 w-[900px] rounded-2xl border p-6 shadow-lg outline-none"
 						>
 							{@render exportOptions()}
 						</Popover.Content>

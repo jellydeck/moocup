@@ -1,8 +1,7 @@
 <script>
+	import Backgrounds from '$lib/editor/Backgrounds.svelte';
+	import Canvas from '$lib/editor/Canvas.svelte';
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-
-<!-- <Canvas /> -->
-<!-- <Backgrounds /> -->
+<Canvas />
+<Backgrounds />
