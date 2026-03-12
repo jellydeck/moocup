@@ -4,6 +4,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { mockupStore } from '$lib/contexts/store.svelte';
 	import { onMount } from 'svelte';
+	import FloatingBar from '$lib/editor/FloatingBar.svelte';
 
 	let { children } = $props();
 
@@ -20,7 +21,7 @@
 			{@render children()}
 		</div>
 
-		<!-- <FloatingBar /> -->
+		<FloatingBar />
 	</div>
 {:else}
 	<div class="grid h-screen place-items-center">

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
+	import { mockupStore } from '$lib/contexts/store.svelte';
+	import Button from '$lib/components/Button.svelte';
 	import { extractDominantColor } from '$lib/utils';
+
 	import ImageIcon from 'phosphor-svelte/lib/ImageIcon';
 	import ClipboardIcon from 'phosphor-svelte/lib/ClipboardIcon';
 	import demoImage from '$lib/assets/demo.webp';
-	import { mockupStore } from '$lib/contexts/store.svelte';
-	import Button from '$lib/components/Button.svelte';
 
 	let fileInputRef = $state<HTMLInputElement | null>(null);
 	let isDragOver = $state(false);
@@ -323,7 +324,7 @@
 	style={mockupStore.fixedMargin && mockupStore.uploadedImage ? 'background:black' : ''}
 >
 	<div
-		class="relative overflow-hidden"
+		class="overflow-hidde relative transition-all duration-300"
 		role="region"
 		style={`width:${layout.canvasWidth};height:${layout.canvasHeight}`}
 		data-mockup-canvas
@@ -403,7 +404,7 @@
 						</div>
 					</div>
 
-					<Button variant="outlined" class="rounded-full!" onclick={onDemoImage}>
+					<Button variant="filled" class="rounded-full!" onclick={onDemoImage}>
 						Use demo Image</Button
 					>
 				</div>
