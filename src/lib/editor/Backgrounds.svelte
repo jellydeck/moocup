@@ -27,7 +27,6 @@
 
 	interface GradientPreset {
 		name: string;
-		colors: string[];
 		image: string;
 	}
 
@@ -44,23 +43,23 @@
 	const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 	const gradientPresets: GradientPreset[] = [
-		{ name: 'Deep Horizon', colors: ['#141e30', '#243b55'], image: deepHorizon },
-		{ name: 'Ocean Glow', colors: ['#56ccf2', '#2f80ed'], image: oceanGlow },
-		{ name: 'Ocean Breeze', colors: ['#ff9a9e', '#fecfef'], image: oceanBreeze },
-		{ name: 'Purple Haze', colors: ['#c471ed', '#f64f59'], image: purpleHaze },
-		{ name: 'Summer Vibes', colors: ['#56ab2f', '#a8e6cf'], image: summerVibes },
-		{ name: 'Rainbow Dreams', colors: ['#ff6b6b', '#4ecdc4'], image: rainbowDreams },
-		{ name: 'Neon Heat', colors: ['#ff0844', '#ffb199'], image: neonHeat },
-		{ name: 'Purple Magic', colors: ['#667eea', '#764ba2'], image: purpleMagic },
-		{ name: 'Sunset Glow', colors: ['#ff9a56', '#ff6b9d'], image: sunsetGlow },
-		{ name: 'Warm Embrace', colors: ['#ff9472', '#f2d388'], image: warmEmbrace },
-		{ name: 'Cosmic Night', colors: ['#667eea', '#764ba2'], image: cosmicNight },
-		{ name: 'Mint Breeze', colors: ['#a8edea', '#fed6e3'], image: mintBreeze },
-		{ name: 'Neon Midnight', colors: ['#c471ed', '#f64f59'], image: neonMidnight },
-		{ name: 'Monochrome', colors: ['#2c3e50', '#34495e'], image: monochrome },
-		{ name: 'Arctic Pulse', colors: ['#cce3df', '#3a6c7a', '#0e1a1f'], image: arcticPulse },
-		{ name: 'Molten Dusk', colors: ['#f0e7da', '#f857a6', '#2c2c2c'], image: moltenDusk },
-		{ name: 'Twilight Ember', colors: ['#ffb88c', '#ea5753', '#111d2f'], image: twilightEmber }
+		{ name: 'Deep Horizon', image: deepHorizon },
+		{ name: 'Ocean Glow', image: oceanGlow },
+		{ name: 'Ocean Breeze', image: oceanBreeze },
+		{ name: 'Purple Haze', image: purpleHaze },
+		{ name: 'Summer Vibes', image: summerVibes },
+		{ name: 'Rainbow Dreams', image: rainbowDreams },
+		{ name: 'Neon Heat', image: neonHeat },
+		{ name: 'Purple Magic', image: purpleMagic },
+		{ name: 'Sunset Glow', image: sunsetGlow },
+		{ name: 'Warm Embrace', image: warmEmbrace },
+		{ name: 'Cosmic Night', image: cosmicNight },
+		{ name: 'Mint Breeze', image: mintBreeze },
+		{ name: 'Neon Midnight', image: neonMidnight },
+		{ name: 'Monochrome', image: monochrome },
+		{ name: 'Arctic Pulse', image: arcticPulse },
+		{ name: 'Molten Dusk', image: moltenDusk },
+		{ name: 'Twilight Ember', image: twilightEmber }
 	];
 
 	const handleCustomBackground = (gradient: GradientPreset | CustomBackground) => {

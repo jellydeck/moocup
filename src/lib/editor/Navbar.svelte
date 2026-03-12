@@ -284,13 +284,13 @@
 				</a>
 			</div>
 			{#if !isMobile}
-				<div class="text-muted-foreground flex items-center gap-2">
+				<div class="flex items-center gap-2 text-text">
 					<span>crafted by</span>
 					<a
 						href="https://jaydip.me"
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-primary text-sm underline hover:no-underline"
+						class="text-sm text-white underline hover:no-underline"
 					>
 						Jaydip
 					</a>

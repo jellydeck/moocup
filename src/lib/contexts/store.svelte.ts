@@ -1,4 +1,3 @@
-// lib/stores/mockup.svelte.ts
 import deepHorizon from '$lib/assets/deep_horizon.webp';
 const STORE_KEY = 'mockup-store';
 
@@ -33,7 +32,6 @@ async function idbSet(key: string, value: string): Promise<void> {
 // ── store ─────────────────────────────────────────────────────
 class MockupStore {
 	uploadedImage = $state<string | null>(null);
-	backgroundColor = $state('#FF6B6B');
 	backgroundType = $state<'solid'>('solid');
 	backgroundImage = $state<string | null>(deepHorizon);
 	aspectRatio = $state('16:9');
@@ -54,10 +52,6 @@ class MockupStore {
 	// ── actions ──────────────────────────────────────────────
 	setUploadedImage(v: string | null) {
 		this.uploadedImage = v;
-		this.#save();
-	}
-	setBackgroundColor(v: string) {
-		this.backgroundColor = v;
 		this.#save();
 	}
 	setBackgroundType(v: 'solid') {
@@ -113,7 +107,6 @@ class MockupStore {
 				STORE_KEY,
 				JSON.stringify({
 					uploadedImage: this.uploadedImage,
-					backgroundColor: this.backgroundColor,
 					backgroundType: this.backgroundType,
 					backgroundImage: this.backgroundImage,
 					aspectRatio: this.aspectRatio,
@@ -137,7 +130,6 @@ class MockupStore {
 
 			const s = JSON.parse(raw);
 			if (s.uploadedImage !== undefined) this.uploadedImage = s.uploadedImage;
-			if (s.backgroundColor !== undefined) this.backgroundColor = s.backgroundColor;
 			if (s.backgroundType !== undefined) this.backgroundType = s.backgroundType;
 			if (s.backgroundImage !== undefined) this.backgroundImage = s.backgroundImage;
 			if (s.aspectRatio !== undefined) this.aspectRatio = s.aspectRatio;
