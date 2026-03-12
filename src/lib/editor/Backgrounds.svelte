@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
 	import { Dialog } from 'bits-ui';
-	import ImageIcon from 'phosphor-svelte/lib/Image';
-	import CaretUp from 'phosphor-svelte/lib/CaretUp';
+	import ImageIcon from 'phosphor-svelte/lib/ImageIcon';
+	import CaretUpIcon from 'phosphor-svelte/lib/CaretUpIcon';
+	import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
+	import XIcon from 'phosphor-svelte/lib/XIcon';
 	import { mockupStore } from '$lib/contexts/store.svelte';
 
-	// ─── Asset imports ────────────────────────────────────────────────────────────
 	import deepHorizon from '$lib/assets/deep_horizon.webp';
 	import oceanGlow from '$lib/assets/ocean_glow.webp';
 	import oceanBreeze from '$lib/assets/ocean_breeze.png';
@@ -24,8 +25,6 @@
 	import moltenDusk from '$lib/assets/molten_dusk.webp';
 	import twilightEmber from '$lib/assets/twilight_ember.webp';
 
-	// ─── Types ────────────────────────────────────────────────────────────────────
-
 	interface GradientPreset {
 		name: string;
 		colors: string[];
@@ -37,16 +36,12 @@
 		image: string;
 	}
 
-	// ─── State ────────────────────────────────────────────────────────────────────
-
 	let isSheetOpen = $state(false);
 	let isDialogOpen = $state(false);
 	let isDragOver = $state(false);
 	let fileInputRef = $state<HTMLInputElement | null>(null);
 
 	const MAX_FILE_SIZE = 10 * 1024 * 1024;
-
-	// ─── Presets (no direction) ───────────────────────────────────────────────────
 
 	const gradientPresets: GradientPreset[] = [
 		{ name: 'Deep Horizon', colors: ['#141e30', '#243b55'], image: deepHorizon },
@@ -68,15 +63,7 @@
 		{ name: 'Twilight Ember', colors: ['#ffb88c', '#ea5753', '#111d2f'], image: twilightEmber }
 	];
 
-	// ─── Handlers ─────────────────────────────────────────────────────────────────
-
-	const handleGradientSelect = (gradient: GradientPreset | CustomBackground) => {
-		mockupStore.setBackgroundType('pattern');
-		if ('colors' in gradient) {
-			mockupStore.setGradientColors(gradient.colors);
-		} else {
-			mockupStore.setGradientColors(['#ffffff', '#ffffff']);
-		}
+	const handleCustomBackground = (gradient: GradientPreset | CustomBackground) => {
 		mockupStore.setBackgroundImage(gradient.image);
 		isSheetOpen = false;
 	};
@@ -103,7 +90,6 @@
 					image: base64Image
 				};
 				mockupStore.addCustomBackground(newBg);
-				handleGradientSelect(newBg);
 				toast('Background added successfully!');
 				setTimeout(() => (isDialogOpen = false), 300);
 				isDragOver = false;
@@ -119,62 +105,66 @@
 
 	const handleDrop = (e: DragEvent) => {
 		e.preventDefault();
+
 		isDragOver = false;
 		const file = e.dataTransfer?.files[0];
-		if (file) handleImageUpload(file);
-		else {
+		if (!file) {
 			toast.error('No valid file dropped.');
 			isDialogOpen = false;
+		} else {
+			handleImageUpload(file);
 		}
 	};
 
 	const handleFileInput = (e: Event) => {
 		const file = (e.target as HTMLInputElement).files?.[0];
-		if (file) handleImageUpload(file);
-		else {
+		if (!file) {
 			toast.error('No file selected.');
 			isDialogOpen = false;
+		} else {
+			handleImageUpload(file);
 		}
 	};
 
 	const handlePaste = (e: ClipboardEvent) => {
 		const file = e.clipboardData?.files[0];
-		if (file) handleImageUpload(file);
-		else {
+		if (!file) {
 			toast.error('No valid image pasted.');
 			isDialogOpen = false;
+		} else {
+			handleImageUpload(file);
 		}
 	};
 </script>
 
-<!-- ─── Snippet: gradient grid ─────────────────────────────────────────────── -->
 {#snippet gradientGrid()}
 	<div class="flex flex-col gap-3">
 		<h3 class="text-sm font-medium text-pine-text">Background Gradients</h3>
 		<div class="grid grid-cols-1 gap-3 max-md:grid-cols-2 md:grid-cols-1">
 			<!-- Custom upload button -->
 			<button
-				class="relative flex h-16 cursor-pointer overflow-hidden rounded-md border-2 border-dashed border-accent hover:outline-2 hover:outline-offset-2 hover:outline-accent focus-visible:outline-2 focus-visible:outline-accent"
+				class="relative flex h-16 cursor-pointer overflow-hidden rounded-md border-2 border-dashed border-accent hover:outline-2 hover:outline-offset-2 hover:outline-text focus-visible:outline-2 focus-visible:outline-accent"
 				onclick={() => (isDialogOpen = true)}
 			>
 				<span
-					class="absolute top-1 left-1 rounded bg-pine/70 px-2 py-1 text-xs font-medium [--casl:1]"
-					>+ Custom Background</span
+					class="absolute top-1 left-1 flex gap-1 rounded bg-pine px-2 py-1 text-xs font-medium text-white"
+				>
+					<PlusIcon size={14} weight="bold" /> Custom Background</span
 				>
 			</button>
 
-			<!-- Custom + preset backgrounds -->
+			<!-- preset backgrounds -->
 			{#each [...mockupStore.customBackgrounds, ...gradientPresets] as gradient, i (gradient.name + i)}
 				<button
 					class={[
-						'relative flex h-16 cursor-pointer overflow-hidden rounded-md hover:outline-2 hover:outline-offset-2 hover:outline-accent focus-visible:outline-2 focus-visible:outline-accent',
+						'relative flex h-16 cursor-pointer overflow-hidden rounded-md hover:outline-2 hover:outline-offset-2 hover:outline-text focus-visible:outline-2 focus-visible:outline-accent',
 						mockupStore.backgroundImage === gradient.image && 'ring-offset-0'
 					]}
 					style="background-image:url({gradient.image});background-size:cover;background-position:center"
-					onclick={() => handleGradientSelect(gradient)}
+					onclick={() => handleCustomBackground(gradient)}
 				>
 					<span
-						class="absolute top-1 left-1 rounded bg-pine/70 px-2 py-1 text-xs font-medium [--casl:1]"
+						class="absolute top-1 left-1 rounded bg-pine/70 px-2 py-1 text-xs font-medium text-white"
 					>
 						{gradient.name}
 					</span>
@@ -184,24 +174,24 @@
 	</div>
 {/snippet}
 
-<!-- ─── Mobile trigger (hidden on md+) ─────────────────────────────────────── -->
+<!-- Mobile trigger (hidden on md+) -->
 <button
 	class="fixed right-4 bottom-24 z-50 flex cursor-pointer items-center gap-2
 	       rounded-full border border-accent bg-pine px-4 py-2 text-sm
 	       font-medium text-pine-text md:hidden"
 	onclick={() => (isSheetOpen = true)}
 >
-	<CaretUp size={18} weight="bold" />
+	<CaretUpIcon size={18} weight="bold" />
 	Background Gradients
 </button>
 
-<!-- ─── Mobile bottom sheet ────────────────────────────────────────────────── -->
+<!-- Mobile bottom sheet -->
 <Dialog.Root bind:open={isSheetOpen}>
 	<Dialog.Portal>
 		<Dialog.Overlay class="fixed inset-0 z-40 bg-black/60" onclick={() => (isSheetOpen = false)} />
 		<Dialog.Content
 			class="fixed right-0 bottom-0 left-0 z-50 flex h-[80vh] flex-col
-			       rounded-t-2xl border-t border-border bg-pine outline-none"
+			       rounded-t-2xl border-t border-border bg-bg outline-none"
 			aria-describedby={undefined}
 		>
 			<!-- drag handle -->
@@ -215,18 +205,18 @@
 	</Dialog.Portal>
 </Dialog.Root>
 
-<!-- ─── Desktop sidebar (hidden on mobile) ─────────────────────────────────── -->
-<div class="hidden w-80 overflow-y-auto border-r border-border bg-bg p-6 md:block">
+<!-- Desktop sidebar (hidden on mobile)-->
+<div class="hidden w-80 overflow-y-auto border-l border-border bg-bg p-6 md:block">
 	{@render gradientGrid()}
 </div>
 
-<!-- ─── Upload dialog ──────────────────────────────────────────────────────── -->
+<!-- Upload dialog -->
 <Dialog.Root bind:open={isDialogOpen}>
 	<Dialog.Portal>
 		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/80" />
 		<Dialog.Content
 			class="fixed top-1/2 left-1/2 z-60 w-[min(90vw,32rem)] -translate-x-1/2
-			       -translate-y-1/2 rounded-2xl border border-border bg-pine p-6 outline-none"
+			       -translate-y-1/2 rounded-2xl border border-accent bg-bg p-6 outline-none"
 			onpaste={handlePaste}
 			aria-describedby="upload-desc"
 		>
@@ -240,7 +230,7 @@
 			<!-- Drop zone -->
 			<div
 				class="relative flex h-64 w-full cursor-pointer flex-col items-center
-				       justify-center rounded-xl border-2 border-dashed
+				       justify-center rounded-xl border-2 border-dotted
 				       {isDragOver ? 'border-accent bg-accent/10' : 'border-border bg-accent/5 hover:bg-accent/10'}"
 				ondrop={handleDrop}
 				ondragover={(e) => {
@@ -276,10 +266,10 @@
 
 			<Dialog.Close
 				class="absolute top-3 right-3 flex h-8 w-8 cursor-pointer items-center
-				       justify-center rounded-full border-none bg-border/50
-				       text-xs text-pine-text outline-none hover:bg-border"
+				       justify-center rounded-full border-none
+				       text-xs text-pine-text hover:text-text hover:ring-2 hover:ring-accent"
 			>
-				✕
+				<XIcon size={16} weight="bold" />
 			</Dialog.Close>
 		</Dialog.Content>
 	</Dialog.Portal>

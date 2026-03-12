@@ -1,5 +1,5 @@
 // lib/stores/mockup.svelte.ts
-
+import deepHorizon from '$lib/assets/deep_horizon.webp';
 const STORE_KEY = 'mockup-store';
 
 // ── tiny IndexedDB helpers (no deps)
@@ -34,10 +34,8 @@ async function idbSet(key: string, value: string): Promise<void> {
 class MockupStore {
 	uploadedImage = $state<string | null>(null);
 	backgroundColor = $state('#FF6B6B');
-	backgroundType = $state<'solid' | 'gradient' | 'pattern'>('pattern');
-	backgroundImage = $state<string | null>('/assets/deep_horizon.webp');
-	gradientColors = $state(['#667eea', '#764ba2']);
-	gradientDirection = $state('to-br');
+	backgroundType = $state<'solid'>('solid');
+	backgroundImage = $state<string | null>(deepHorizon);
 	aspectRatio = $state('16:9');
 	fixedMargin = $state(false);
 	devicePosition = $state({ x: 0, y: 0, scale: 1, rotation: 0 });
@@ -62,20 +60,12 @@ class MockupStore {
 		this.backgroundColor = v;
 		this.#save();
 	}
-	setBackgroundType(v: 'solid' | 'gradient' | 'pattern') {
+	setBackgroundType(v: 'solid') {
 		this.backgroundType = v;
 		this.#save();
 	}
 	setBackgroundImage(v: string | null) {
 		this.backgroundImage = v;
-		this.#save();
-	}
-	setGradientColors(v: string[]) {
-		this.gradientColors = v;
-		this.#save();
-	}
-	setGradientDirection(v: string) {
-		this.gradientDirection = v;
 		this.#save();
 	}
 	setAspectRatio(v: string) {
@@ -126,8 +116,6 @@ class MockupStore {
 					backgroundColor: this.backgroundColor,
 					backgroundType: this.backgroundType,
 					backgroundImage: this.backgroundImage,
-					gradientColors: this.gradientColors,
-					gradientDirection: this.gradientDirection,
 					aspectRatio: this.aspectRatio,
 					fixedMargin: this.fixedMargin,
 					devicePosition: this.devicePosition,
@@ -152,8 +140,6 @@ class MockupStore {
 			if (s.backgroundColor !== undefined) this.backgroundColor = s.backgroundColor;
 			if (s.backgroundType !== undefined) this.backgroundType = s.backgroundType;
 			if (s.backgroundImage !== undefined) this.backgroundImage = s.backgroundImage;
-			if (s.gradientColors !== undefined) this.gradientColors = s.gradientColors;
-			if (s.gradientDirection !== undefined) this.gradientDirection = s.gradientDirection;
 			if (s.aspectRatio !== undefined) this.aspectRatio = s.aspectRatio;
 			if (s.fixedMargin !== undefined) this.fixedMargin = s.fixedMargin;
 			if (s.devicePosition !== undefined)

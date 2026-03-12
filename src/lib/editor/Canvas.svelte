@@ -2,102 +2,117 @@
 	import { toast } from 'svelte-sonner';
 	import { extractDominantColor } from '$lib/utils';
 	import ImageIcon from 'phosphor-svelte/lib/ImageIcon';
-	import Clipboard from 'phosphor-svelte/lib/Clipboard';
+	import ClipboardIcon from 'phosphor-svelte/lib/ClipboardIcon';
+	import demoImage from '$lib/assets/demo.webp';
 	import { mockupStore } from '$lib/contexts/store.svelte';
 
-	// ─── Types ───────────────────────────────────────────────────────────────────
+	// ─── State ───────────────────────────────────────────────────────────────────
 
-	interface ResponsiveConfig {
-		isMobile: boolean;
-		isTablet: boolean;
-		basePadding: number;
-		scaleMultiplier: number;
-		maxContainerWidth: number;
-		maxContainerHeight: number;
-		dropZoneWidth: string;
-		dropZoneHeight: string;
-	}
+	let fileInputRef = $state<HTMLInputElement | null>(null);
+	let isDragOver = $state(false);
+	let showPasteHint = $state(false);
+	let naturalSize = $state<{ w: number; h: number } | null>(null);
+	let viewport = $state({
+		width: window.innerWidth,
+		height: window.innerHeight
+	});
 
-	interface ImageDimensions {
-		width: number;
-		height: number;
-	}
+	// ─── Image natural size (single $effect) ────────────────────────────────────
 
-	// ─── Responsive config ───────────────────────────────────────────────────────
-
-	const getResponsiveConfig = (): ResponsiveConfig => {
-		const viewportWidth = window.innerWidth;
-		const viewportHeight = window.innerHeight;
-		const isMobile = viewportWidth < 768;
-		const isTablet = viewportWidth >= 768 && viewportWidth < 1024;
-		const basePadding = isMobile ? 40 : isTablet ? 100 : 200;
-		const scaleMultiplier = isMobile ? 0.95 : isTablet ? 0.85 : 0.8;
-		const maxWidth = isMobile ? 1000 : isTablet ? 1100 : 1200;
-		const maxHeight = isMobile ? 700 : isTablet ? 750 : 800;
-		const availableWidth = viewportWidth - basePadding;
-		const availableHeight = viewportHeight - basePadding;
-		const maxContainerWidth = Math.min(availableWidth * scaleMultiplier, maxWidth);
-		const maxContainerHeight = Math.min(availableHeight * scaleMultiplier, maxHeight);
-		return {
-			isMobile,
-			isTablet,
-			basePadding,
-			scaleMultiplier,
-			maxContainerWidth,
-			maxContainerHeight,
-			dropZoneWidth: isMobile ? '95%' : isTablet ? '70%' : '60%',
-			dropZoneHeight: isMobile ? '60%' : '50%'
+	$effect(() => {
+		const src = mockupStore.uploadedImage;
+		if (!src) {
+			naturalSize = null;
+			return;
+		}
+		const img = new Image();
+		img.onload = () => {
+			naturalSize = { w: img.naturalWidth, h: img.naturalHeight };
 		};
-	};
+		img.src = src;
+	});
 
-	// ─── Image utilities ─────────────────────────────────────────────────────────
+	// ─── Derived: scaled dimensions ──────────────────────────────────────────────
 
-	const optimizeImage = (file: File): Promise<string> => {
-		return new Promise((resolve, reject) => {
-			if (file.size < 2 * 1024 * 1024) {
-				const reader = new FileReader();
-				reader.onload = (e) => resolve(e.target?.result as string);
-				reader.onerror = reject;
-				reader.readAsDataURL(file);
-				return;
-			}
-			const canvas = document.createElement('canvas');
-			const ctx = canvas.getContext('2d');
-			const img = new Image();
-			img.onload = () => {
-				const MAX_WIDTH = 2400;
-				const MAX_HEIGHT = 1800;
-				let { width, height } = img;
-				if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-					const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
-					width = Math.round(width * ratio);
-					height = Math.round(height * ratio);
-				}
-				canvas.width = width;
-				canvas.height = height;
-				ctx?.drawImage(img, 0, 0, width, height);
-				let optimizedDataUrl: string;
-				try {
-					optimizedDataUrl = canvas.toDataURL('image/png');
-					if (optimizedDataUrl.length > 5 * 1024 * 1024) {
-						optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
+	const scaledDims = $derived.by(() => {
+		if (!naturalSize) return { width: 400, height: 300 };
+
+		const maxWidth = Math.min(viewport.width * 0.8, 1200);
+		const maxHeight = Math.min(viewport.height * 0.8, 800);
+
+		const scale = Math.min(maxWidth / naturalSize.w, maxHeight / naturalSize.h, 1);
+
+		return {
+			width: Math.round(naturalSize.w * scale),
+			height: Math.round(naturalSize.h * scale)
+		};
+	});
+
+	// ─── Derived: inline styles ──────────────────────────────────────────────────
+
+	const canvasStyle = $derived(
+		mockupStore.fixedMargin && mockupStore.uploadedImage
+			? `width:${scaledDims.width + mockupStore.margin.left + mockupStore.margin.right}px;height:${scaledDims.height + mockupStore.margin.top + mockupStore.margin.bottom}px`
+			: 'width:100%;height:100%'
+	);
+
+	const backgroundStyle = $derived.by(() => {
+		const s = mockupStore;
+		return `background-image:url(${s.backgroundImage});background-size:cover;background-position:center;background-repeat:no-repeat;width:100%;height:100%`;
+	});
+
+	const imageContainerStyle = $derived(
+		mockupStore.fixedMargin && mockupStore.uploadedImage
+			? `position:absolute;top:${mockupStore.margin.top}px;right:${mockupStore.margin.right}px;bottom:${mockupStore.margin.bottom}px;left:${mockupStore.margin.left}px;display:flex;align-items:center;justify-content:center`
+			: 'display:flex;align-items:center;justify-content:center;width:100%;height:100%'
+	);
+
+	const imageStyle = $derived.by(() => {
+		const { x, y, scale, rotation } = mockupStore.devicePosition;
+		const { rotateX, rotateY, rotateZ, skew } = mockupStore.rotation3D;
+		const { width, height } = scaledDims;
+		const transform = `translate(${x}px,${y}px) scale(${scale}) rotate(${rotation}deg) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg) skew(${skew}deg)`;
+		let s = `width:${width}px;height:${height}px;transform:${transform};transform-origin:center center;transform-style:preserve-3d;`;
+		const b = mockupStore.imageBorder;
+		if (b.enabled)
+			s += `border:${b.width}px solid ${b.color};border-radius:${b.radius}px;box-shadow:${b.shadow};`;
+		return s;
+	});
+
+	// ─── Clipboard paste ($effect #2, intentionally kept — needs document listener) ──
+
+	$effect(() => {
+		const onPaste = async (e: ClipboardEvent) => {
+			const file = Array.from(e.clipboardData?.items ?? [])
+				.find((i) => i.type.startsWith('image/'))
+				?.getAsFile();
+			if (!file) return;
+
+			if (mockupStore.uploadedImage) {
+				showPasteHint = true;
+				toast('Image in clipboard detected!', {
+					duration: 3000,
+					action: {
+						label: 'Clear & Paste',
+						onClick: () => {
+							mockupStore.setUploadedImage(null);
+							localStorage.removeItem('demoImage');
+							setTimeout(() => uploadFile(file), 100);
+						}
 					}
-				} catch {
-					optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
-				}
-				resolve(optimizedDataUrl);
-			};
-			img.onerror = reject;
-			img.src = URL.createObjectURL(file);
-		});
-	};
+				});
+				setTimeout(() => (showPasteHint = false), 3000);
+			} else {
+				await uploadFile(file);
+				localStorage.removeItem('demoImage');
+				toast('Image pasted successfully!');
+			}
+		};
+		document.addEventListener('paste', onPaste);
+		return () => document.removeEventListener('paste', onPaste);
+	});
 
-	const fetchDemoImage = async (): Promise<File> => {
-		const response = await fetch('/assets/demo.webp');
-		if (!response.ok) throw new Error('Failed to fetch demo image');
-		const blob = await response.blob();
-		return new File([blob], 'demo.webp', { type: 'image/webp' });
-	};
+	// ─── Upload helpers ───────────────────────────────────────────────────────────
 
 	const hexToRgb = (hex: string) => ({
 		r: parseInt(hex.slice(1, 3), 16),
@@ -105,310 +120,137 @@
 		b: parseInt(hex.slice(5, 7), 16)
 	});
 
-	// ─── Local state ─────────────────────────────────────────────────────────────
-
-	let fileInputRef = $state<HTMLInputElement | null>(null);
-	let isDragOver = $state(false);
-	let imageDimensions = $state<ImageDimensions | null>(null);
-	let responsiveConfig = $state<ResponsiveConfig>(getResponsiveConfig());
-	let showPasteHint = $state(false);
-
-	// ─── Derived styles ──────────────────────────────────────────────────────────
-
-	const canvasStyle = $derived.by((): string => {
-		if (!mockupStore.fixedMargin || !imageDimensions || !mockupStore.uploadedImage) {
-			return 'width:100%;height:100%';
-		}
-		const totalWidth = imageDimensions.width + mockupStore.margin.left + mockupStore.margin.right;
-		const totalHeight = imageDimensions.height + mockupStore.margin.top + mockupStore.margin.bottom;
-		return `width:${totalWidth}px;height:${totalHeight}px`;
-	});
-
-	const backgroundStyle = $derived.by((): string => {
-		let bg = '';
-		if (mockupStore.backgroundType === 'pattern' && mockupStore.backgroundImage) {
-			bg = `background-image:url(${mockupStore.backgroundImage});background-size:cover;background-position:center;background-repeat:no-repeat;`;
-		} else if (mockupStore.backgroundType === 'gradient') {
-			const direction = mockupStore.gradientDirection.replace('to-', '');
-			const degreeMap: Record<string, string> = {
-				r: '90deg',
-				br: '135deg',
-				b: '180deg',
-				bl: '225deg',
-				l: '270deg',
-				tl: '315deg',
-				t: '0deg',
-				tr: '45deg'
-			};
-			const angle = degreeMap[direction] ?? '135deg';
-			bg = `background:linear-gradient(${angle},${mockupStore.gradientColors.join(',')});`;
-		} else {
-			bg = `background-color:${mockupStore.backgroundColor};`;
-		}
-		return bg + 'width:100%;height:100%';
-	});
-
-	const imageContainerStyle = $derived.by((): string => {
-		if (!mockupStore.fixedMargin || !imageDimensions || !mockupStore.uploadedImage) {
-			return 'display:flex;align-items:center;justify-content:center;width:100%;height:100%';
-		}
-		return [
-			'position:absolute',
-			`top:${mockupStore.margin.top}px`,
-			`right:${mockupStore.margin.right}px`,
-			`bottom:${mockupStore.margin.bottom}px`,
-			`left:${mockupStore.margin.left}px`,
-			'display:flex',
-			'align-items:center',
-			'justify-content:center'
-		].join(';');
-	});
-
-	const imageStyle = $derived.by((): string => {
-		const dims = imageDimensions ?? { width: 400, height: 300 };
-		const transform = [
-			`translate(${mockupStore.devicePosition.x}px,${mockupStore.devicePosition.y}px)`,
-			`scale(${mockupStore.devicePosition.scale})`,
-			`rotate(${mockupStore.devicePosition.rotation}deg)`,
-			`rotateX(${mockupStore.rotation3D.rotateX}deg)`,
-			`rotateY(${mockupStore.rotation3D.rotateY}deg)`,
-			`rotateZ(${mockupStore.rotation3D.rotateZ}deg)`,
-			`skew(${mockupStore.rotation3D.skew}deg)`
-		].join(' ');
-
-		let style = `width:${dims.width}px;height:${dims.height}px;transform:${transform};transform-origin:center center;transform-style:preserve-3d;`;
-
-		if (mockupStore.imageBorder.enabled) {
-			style += `border:${mockupStore.imageBorder.width}px solid ${mockupStore.imageBorder.color};border-radius:${mockupStore.imageBorder.radius}px;box-shadow:${mockupStore.imageBorder.shadow};`;
-		}
-		return style;
-	});
-
-	const dropZoneClasses = $derived(
-		[
-			'relative transition-all duration-300 cursor-pointer border-2 border-dashed rounded-xl bg-gray-900/50 mx-auto top-[15%] md:top-[25%]',
-			'hover:bg-gray-900/70',
-			isDragOver ? 'scale-105 border-primary' : 'border-gray-400'
-		].join(' ')
-	);
-
-	const overlayTextSize = $derived(responsiveConfig.isMobile ? 'text-base' : 'text-xl');
-	const iconSize = $derived(responsiveConfig.isMobile ? 32 : 48);
-
-	// ─── Effects ─────────────────────────────────────────────────────────────────
-
-	$effect(() => {
-		const handleResize = () => {
-			responsiveConfig = getResponsiveConfig();
-		};
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
-	});
-
-	$effect(() => {
-		const handlePaste = async (e: ClipboardEvent) => {
-			const items = e.clipboardData?.items;
-			if (!items) return;
-			for (const item of Array.from(items)) {
-				if (item.type.startsWith('image/')) {
-					const file = item.getAsFile();
-					if (file) {
-						if (mockupStore.uploadedImage) {
-							showPasteHint = true;
-							toast('Image in clipboard detected! Clear current image to paste new one.', {
-								duration: 3000,
-								action: {
-									label: 'Clear & Paste',
-									onClick: () => {
-										mockupStore.setUploadedImage(null);
-										localStorage.removeItem('demoImage');
-										setTimeout(() => handleImageUpload(file), 100);
-									}
-								}
-							});
-							setTimeout(() => {
-								showPasteHint = false;
-							}, 3000);
-						} else {
-							await handleImageUpload(file);
-							localStorage.removeItem('demoImage');
-							toast('Image pasted successfully!');
-						}
-					}
-					break;
-				}
-			}
-		};
-		document.addEventListener('paste', handlePaste);
-		return () => document.removeEventListener('paste', handlePaste);
-	});
-
-	$effect(() => {
-		if (!mockupStore.uploadedImage) {
-			imageDimensions = null;
-			return;
-		}
-		const img = new Image();
-		img.onload = () => {
-			const { maxContainerWidth, maxContainerHeight } = responsiveConfig;
-			const scaleX = maxContainerWidth / img.width;
-			const scaleY = maxContainerHeight / img.height;
-			const scale = Math.min(scaleX, scaleY, 1);
-			imageDimensions = {
-				width: Math.round(img.width * scale),
-				height: Math.round(img.height * scale)
-			};
-		};
-		img.src = mockupStore.uploadedImage;
-	});
-
-	// ─── Handlers ────────────────────────────────────────────────────────────────
-
-	const handleImageUpload = async (file: File) => {
-		let loadingToast: string | number | undefined;
-		if (file.size > 1024 * 1024) {
-			loadingToast = toast('Processing image...', { duration: Infinity });
-		}
-
-		const applyBorder = (r: number, g: number, b: number) => {
-			const borderWidth = responsiveConfig.isMobile ? 4 : 8;
-			mockupStore.setImageBorder({
-				enabled: true,
-				width: borderWidth,
-				color: `rgba(${r},${g},${b},0.5)`,
-				shadow: 'rgba(0,0,0,0.16) 0px 3px 6px, rgba(0,0,0,0.23) 0px 3px 6px'
-			});
-		};
-
-		const applyDefaultBorder = () => {
-			const borderWidth = responsiveConfig.isMobile ? 4 : 8;
-			mockupStore.setImageBorder({
-				enabled: true,
-				width: borderWidth,
-				color: 'rgba(156,163,137,0.5)',
-				shadow: 'rgba(0,0,0,0.16) 0px 3px 6px, rgba(0,0,0,0.23) 0px 3px 6px'
-			});
-		};
-
-		try {
-			const dataUrl = await optimizeImage(file);
-			mockupStore.setUploadedImage(dataUrl);
-
-			requestAnimationFrame(async () => {
-				try {
-					const dominant = await extractDominantColor(dataUrl);
-					const validHex = /^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : '#9CA389';
-					const { r, g, b } = hexToRgb(validHex);
-					applyBorder(r, g, b);
-					toast('Image uploaded with transparent border!');
-				} catch {
-					applyDefaultBorder();
-					toast('Image uploaded with default transparent border!');
-				} finally {
-					if (loadingToast !== undefined) toast.dismiss(loadingToast);
-				}
-			});
-		} catch {
-			// Fallback: plain FileReader
-			const reader = new FileReader();
-			reader.onload = async (e) => {
-				const result = e.target?.result as string;
-				mockupStore.setUploadedImage(result);
-				try {
-					const dominant = await extractDominantColor(result);
-					const validHex = /^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : '#9CA389';
-					const { r, g, b } = hexToRgb(validHex);
-					applyBorder(r, g, b);
-					toast('Image uploaded with transparent border!');
-				} catch {
-					applyDefaultBorder();
-					toast('Image uploaded with default transparent border!');
-				}
-			};
-			reader.readAsDataURL(file);
-			if (loadingToast !== undefined) toast.dismiss(loadingToast);
-		}
+	const applyBorder = (hex?: string) => {
+		const color = hex
+			? (() => {
+					const { r, g, b } = hexToRgb(hex);
+					return `rgba(${r},${g},${b},0.5)`;
+				})()
+			: 'rgba(156,163,137,0.5)';
+		mockupStore.setImageBorder({
+			enabled: true,
+			width: 8,
+			color,
+			shadow: 'rgba(0,0,0,0.16) 0px 3px 6px, rgba(0,0,0,0.23) 0px 3px 6px'
+		});
 	};
 
-	const handleDrop = (e: DragEvent) => {
+	const toDataUrl = (file: File): Promise<string> =>
+		new Promise((resolve, reject) => {
+			if (file.size < 2 * 1024 * 1024) {
+				const r = new FileReader();
+				r.onload = (e) => resolve(e.target!.result as string);
+				r.onerror = reject;
+				r.readAsDataURL(file);
+				return;
+			}
+			const img = new Image();
+			img.onload = () => {
+				const canvas = document.createElement('canvas');
+				const ratio = Math.min(2400 / img.width, 1800 / img.height, 1);
+				canvas.width = Math.round(img.width * ratio);
+				canvas.height = Math.round(img.height * ratio);
+				canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+				resolve(canvas.toDataURL('image/png'));
+			};
+			img.onerror = reject;
+			img.src = URL.createObjectURL(file);
+		});
+
+	const uploadFile = async (file: File) => {
+		const loadingToast =
+			file.size > 1024 * 1024 ? toast('Processing image...', { duration: Infinity }) : undefined;
+
+		const dataUrl = await toDataUrl(file);
+		mockupStore.setUploadedImage(dataUrl);
+		if (loadingToast) toast.dismiss(loadingToast);
+
+		try {
+			const dominant = await extractDominantColor(dataUrl);
+			applyBorder(/^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : undefined);
+		} catch {
+			applyBorder();
+		}
+		toast('Image uploaded!');
+	};
+
+	const onDrop = (e: DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
 		isDragOver = false;
-		const imageFile = Array.from(e.dataTransfer?.files ?? []).find((f) =>
-			f.type.startsWith('image/')
-		);
-		if (imageFile) {
+		const file = Array.from(e.dataTransfer?.files ?? []).find((f) => f.type.startsWith('image/'));
+		if (file) {
 			localStorage.removeItem('demoImage');
-			handleImageUpload(imageFile);
+			uploadFile(file);
 		}
 	};
 
-	const handleDragOver = (e: DragEvent) => {
-		e.preventDefault();
-		e.stopPropagation();
-		isDragOver = true;
-	};
-
-	const handleFileSelect = (e: Event) => {
+	const onFileSelect = (e: Event) => {
 		const file = (e.target as HTMLInputElement).files?.[0];
 		if (file) {
 			localStorage.removeItem('demoImage');
-			handleImageUpload(file);
+			uploadFile(file);
 		}
 	};
 
-	const handleDemoImage = async (e?: MouseEvent) => {
-		e?.stopPropagation();
+	const onDemoImage = async (e: MouseEvent) => {
+		e.stopPropagation();
 		try {
-			const demoFile = await fetchDemoImage();
-			await handleImageUpload(demoFile);
-			localStorage.setItem('demoImage', '/assets/demo.webp');
-			toast('Demo image applied successfully!');
-		} catch (err) {
+			const blob = await fetch(demoImage).then((r) => r.blob());
+			await uploadFile(new File([blob], 'demo.webp', { type: 'image/webp' }));
+			localStorage.setItem('demoImage', demoImage);
+		} catch {
 			toast.error('Failed to load demo image.');
-			console.error(err);
 		}
 	};
 </script>
 
+<svelte:window
+	onresize={() => {
+		viewport.width = window.innerWidth;
+		viewport.height = window.innerHeight;
+	}}
+/>
+
 <div
-	class="relative flex flex-1 items-center justify-center transition-all duration-300"
-	style={mockupStore.fixedMargin && imageDimensions && mockupStore.uploadedImage
-		? 'background-color:black'
-		: ''}
+	class="relative flex flex-1 items-center justify-center"
+	style={mockupStore.fixedMargin && mockupStore.uploadedImage ? 'background-color:black' : ''}
 >
 	<div
-		class="relative overflow-hidden transition-all duration-300"
+		class="relative overflow-hidden"
 		style={canvasStyle}
 		data-mockup-canvas
-		ondrop={mockupStore.uploadedImage ? handleDrop : undefined}
-		ondragover={mockupStore.uploadedImage ? handleDragOver : undefined}
+		role="region"
+		ondrop={mockupStore.uploadedImage ? onDrop : undefined}
+		ondragover={mockupStore.uploadedImage
+			? (e) => {
+					e.preventDefault();
+					isDragOver = true;
+				}
+			: undefined}
+		ondragleave={mockupStore.uploadedImage ? () => (isDragOver = false) : undefined}
 	>
-		<div class="relative transition-all duration-300" style={backgroundStyle}>
+		<div class="relative size-full" style={backgroundStyle}>
 			{#if mockupStore.uploadedImage}
 				<div style={imageContainerStyle}>
 					<div class="relative">
 						<img
 							src={mockupStore.uploadedImage}
 							alt="Uploaded mockup"
-							class="will-transform relative size-full transition-all duration-300 select-none"
+							class="select-none"
 							style={imageStyle}
 							crossorigin="anonymous"
 							ondragover={(e) => e.stopPropagation()}
 						/>
-
 						{#if isDragOver}
 							<div
-								class="bg-primary/30 absolute inset-0 z-10 flex items-center justify-center rounded-xl"
+								class="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-accent/30"
 							>
-								<div
-									class="text-primary rounded-lg bg-white/90 px-6 py-3 font-semibold {overlayTextSize}"
-								>
-									Drop to replace image
-								</div>
+								<span class="rounded-lg bg-white/90 px-6 py-3 font-semibold text-accent">
+									Drop to replace
+								</span>
 							</div>
 						{/if}
-
 						{#if showPasteHint}
 							<div
 								class="absolute inset-0 z-20 flex animate-pulse items-center justify-center rounded-xl bg-blue-500/20"
@@ -416,7 +258,7 @@
 								<div
 									class="rounded-lg bg-white/95 px-6 py-3 text-center font-semibold text-blue-600 shadow-lg"
 								>
-									<Clipboard class="mr-2 inline-block h-5 w-5" />
+									<ClipboardIcon class="mr-2 inline-block h-5 w-5" />
 									Image ready to paste!
 								</div>
 							</div>
@@ -424,51 +266,40 @@
 					</div>
 				</div>
 			{:else}
+				<!-- Drop zone -->
 				<div
-					class={dropZoneClasses}
-					style="width:{responsiveConfig.dropZoneWidth};height:{responsiveConfig.dropZoneHeight}"
-					ondrop={handleDrop}
-					ondragover={handleDragOver}
+					class={[
+						'absolute top-1/4 left-1/2 -translate-x-1/2',
+						'flex h-[50%] w-[60%] flex-col items-center justify-center gap-4 max-md:h-[60%] max-md:w-[90%]',
+						'cursor-pointer rounded-xl border-2 border-dashed border-accent bg-black/40',
+						isDragOver && 'border-solid bg-border/10'
+					]}
+					ondrop={onDrop}
+					ondragover={(e) => {
+						e.preventDefault();
+						isDragOver = true;
+					}}
+					ondragleave={() => (isDragOver = false)}
 					onclick={() => fileInputRef?.click()}
 					role="button"
 					tabindex="0"
 					onkeydown={(e) => e.key === 'Enter' && fileInputRef?.click()}
 				>
-					<div class="absolute inset-0 flex flex-col items-center justify-center">
-						<ImageIcon size={iconSize} class="mb-4 text-gray-100" />
-
-						<div class="px-4 text-center text-white">
-							<p class="mb-1 font-semibold {responsiveConfig.isMobile ? 'text-base' : 'text-lg'}">
-								Drop image here or click to upload
-							</p>
-							<p class="mb-2 text-white/70 {responsiveConfig.isMobile ? 'text-xs' : 'text-sm'}">
-								Supports JPG, PNG
-							</p>
-							<div class="flex items-center justify-center gap-2 font-semibold text-white">
-								<Clipboard class="h-4 w-4" strokeWidth={2.5} />
-								<span class="{responsiveConfig.isMobile ? 'text-xs' : 'text-sm'} text-white/70">
-									Or paste image (Ctrl+V)
-								</span>
-							</div>
+					<ImageIcon size={48} class="text-white/60" weight="duotone" />
+					<div class="text-center text-white">
+						<p class="font-semibold">Drop image here or click to upload</p>
+						<p class="mt-1 text-sm text-white/60">Supports JPG, PNG</p>
+						<div class="mt-2 flex items-center justify-center gap-2 text-sm text-white/50">
+							<ClipboardIcon class="h-4 w-4" weight="bold" />
+							<span>Or paste (Ctrl+V)</span>
 						</div>
-
-						<button
-							class="border-primary z-50 mt-6 rounded-full border-2 bg-gray-900/50 px-4 py-2 text-sm text-white transition-colors hover:bg-gray-900"
-							onclick={handleDemoImage}
-						>
-							Use Demo Image
-						</button>
 					</div>
-
-					{#if isDragOver}
-						<div class="bg-primary/20 absolute inset-0 flex items-center justify-center rounded-xl">
-							<div
-								class="text-primary rounded-lg bg-white/90 px-6 py-3 font-semibold {overlayTextSize}"
-							>
-								Drop image here
-							</div>
-						</div>
-					{/if}
+					<button
+						class="rounded-full border border-accent bg-black/50 px-4 py-1.5 text-sm font-bold text-white hover:bg-black/70"
+						onclick={onDemoImage}
+					>
+						Use demo Image
+					</button>
 				</div>
 			{/if}
 		</div>
@@ -477,7 +308,7 @@
 			bind:this={fileInputRef}
 			type="file"
 			accept="image/*"
-			onchange={handleFileSelect}
+			onchange={onFileSelect}
 			class="hidden"
 		/>
 	</div>

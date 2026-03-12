@@ -19,7 +19,7 @@
 	let exportFormat = $state('PNG');
 	let quality = $state('2');
 	let isExporting = $state(false);
-	let isDialogOpen = $state(false);
+	let isDialogOpen = $state(true);
 	let isUpiDialogOpen = $state(false);
 
 	const { uploadedImage } = $derived(mockupStore);
@@ -51,7 +51,7 @@
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				a.href = url;
-				a.download = `mockup-${Date.now()}.${format.toLowerCase()}`;
+				a.download = `moocup-${Date.now()}.${format.toLowerCase()}`;
 				document.body.appendChild(a);
 				a.click();
 				document.body.removeChild(a);
@@ -77,90 +77,72 @@
 			isExporting = false;
 		}
 	}
-
-	// async function handleAllFormatsExport() {
-	// 	if (!uploadedImage) {
-	// 		toast.error('Please upload an image first');
-	// 		return;
-	// 	}
-	// 	isExporting = true;
-	// 	const formats = ['PNG', 'JPEG', 'WebP'];
-	// 	try {
-	// 		await Promise.all(formats.map((f) => exportImage(f, parseInt(quality))));
-	// 		toast.success(`Successfully exported all formats (${formats.join(', ')})!`);
-	// 	} catch {
-	// 		toast.error('Failed to export some formats. Please try again.');
-	// 	} finally {
-	// 		isExporting = false;
-	// 	}
-	// }
 </script>
 
-<!-- ─── Export Panel Snippet ──────────────────────────────── -->
 {#snippet exportOptions()}
 	<div class={isMobile ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-6'}>
-		<!-- Controls col -->
+		<!-- Controls -->
 		<div class={!isMobile ? 'order-2' : 'order-1'}>
 			<h3 class="text-foreground mb-6 flex items-center gap-2 text-xl font-semibold">
-				<DownloadSimpleIcon size={20} class="text-primary" />
-				Export Settings
+				<DownloadSimpleIcon size={20} weight="fill" />
+				Export Options
 			</h3>
 
 			<!-- Format -->
 			<div class="space-y-2">
-				<label class="text-sm font-medium">Format</label>
-				<ToggleGroup.Root
-					type="single"
-					bind:value={exportFormat}
-					class="bg-sidebar/80 ring-secondary flex gap-1 rounded-full p-1 ring-2"
-				>
-					{#each ['PNG', 'JPEG', 'WebP'] as fmt}
-						<ToggleGroup.Item
-							value={fmt}
-							class="hover:bg-secondary hover:text-secondary-foreground data-[state=on]:bg-primary/20 data-[state=on]:text-primary flex-1 cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors"
-						>
-							{fmt}
-						</ToggleGroup.Item>
-					{/each}
-				</ToggleGroup.Root>
+				<fieldset>
+					<legend class="mb-1 text-sm font-bold">Format</legend>
+					<ToggleGroup.Root
+						type="single"
+						bind:value={exportFormat}
+						class="flex gap-1 rounded-full bg-pine/30 p-1 ring-2 ring-border"
+					>
+						{#each ['PNG', 'JPEG', 'WebP'] as fmt (fmt)}
+							<ToggleGroup.Item
+								value={fmt}
+								class="flex-1 cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-accent/50 data-[state=on]:bg-accent data-[state=on]:text-text"
+							>
+								{fmt}
+							</ToggleGroup.Item>
+						{/each}
+					</ToggleGroup.Root>
+				</fieldset>
 			</div>
 
 			<!-- Quality -->
 			<div class="mt-6 space-y-2">
-				<label class="text-sm font-medium">Quality</label>
-				<ToggleGroup.Root
-					type="single"
-					bind:value={quality}
-					class="bg-sidebar/80 ring-secondary flex gap-1 rounded-full p-1 ring-2"
-				>
-					{#each [['1', 'Standard'], ['2', 'High'], ['3', 'Ultra']] as [val, label]}
-						<ToggleGroup.Item
-							value={val}
-							class="hover:bg-secondary hover:text-secondary-foreground data-[state=on]:bg-primary/20 data-[state=on]:text-primary flex-1 cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors"
-						>
-							{label}
-						</ToggleGroup.Item>
-					{/each}
-				</ToggleGroup.Root>
+				<fieldset>
+					<legend class="mb-1 text-sm font-bold">Quality</legend>
+					<ToggleGroup.Root
+						type="single"
+						bind:value={quality}
+						class="flex gap-1 rounded-full bg-pine/50 p-1 ring-2 ring-border"
+					>
+						{#each [['1', 'Standard'], ['2', 'High'], ['3', 'Ultra']] as [val, label] (label)}
+							<ToggleGroup.Item
+								value={val}
+								class="flex-1 cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-accent/50 data-[state=on]:bg-accent data-[state=on]:text-text"
+							>
+								{label}
+							</ToggleGroup.Item>
+						{/each}
+					</ToggleGroup.Root>
+				</fieldset>
 			</div>
 
 			<!-- Export Buttons -->
-			<div class="mt-12 grid grid-cols-2 gap-3">
-				<Button onclick={handleSingleExport} disabled={isExporting || !uploadedImage}>
+			<div class="mt-10 flex justify-center">
+				<Button
+					class="flex-1"
+					onclick={handleSingleExport}
+					disabled={isExporting || !uploadedImage}
+				>
 					{#if isExporting}
 						<SpinnerGapIcon size={20} class="animate-spin" /> Exporting...
 					{:else}
 						<DownloadSimpleIcon size={20} /> Export as {exportFormat}
 					{/if}
 				</Button>
-
-				<!-- <Button onclick={handleAllFormatsExport} disabled={isExporting || !uploadedImage}>
-					{#if isExporting}
-						<SpinnerGapIcon size={20} class="animate-spin" /> Exporting All...
-					{:else}
-						<DownloadSimpleIcon size={20} /> Export All Formats
-					{/if}
-				</Button> -->
 			</div>
 
 			<a
@@ -174,9 +156,9 @@
 			</a>
 		</div>
 
-		<!-- Support card col -->
+		<!-- My Details -->
 		<div
-			class={`border-primary/20 rounded-xl border-2 border-dashed p-5 ${!isMobile ? 'order-1' : 'order-2'} group`}
+			class={`rounded-3xl border-2 border-dotted border-accent/70 p-5 ${!isMobile ? 'order-1' : 'order-2'} group`}
 		>
 			<HeartIcon
 				size={20}
@@ -200,37 +182,35 @@
 					moocup is a simple offline tool.
 				</p>
 				<p class="text-muted-foreground text-sm leading-relaxed">
-					focus on your craft, we'll take care of rest.
-				</p>
-				<p class="text-muted-foreground text-sm leading-relaxed">
 					you can show your support by sponsoring my work!
 				</p>
 			</div>
 
-			<div class="space-y-3">
-				<a
+			<div class="flex gap-2">
+				<Button
 					href="https://ko-fi.com/jaydipsanghani"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="bg-primary text-primary-foreground hover:bg-primary/90 flex h-12 w-full items-center justify-center gap-2 rounded-md font-medium shadow-md transition-colors"
+					class="transition-colors"
 				>
 					<CoffeeIcon size={20} />
 					Buy a coffee
-				</a>
+				</Button>
 
 				<!-- UPI Dialog -->
 				<Dialog.Root bind:open={isUpiDialogOpen}>
-					<Dialog.Trigger
-						class="border-primary/30 bg-background hover:bg-primary/5 hover:border-primary/50 flex h-12 w-full items-center justify-center rounded-md border font-medium transition-colors"
-					>
-						UPI (India)
+					<Dialog.Trigger>
+						{#snippet child({ props })}
+							<Button variant="outlined" {...props} disabled={!uploadedImage}>UPI (India)</Button>
+						{/snippet}
 					</Dialog.Trigger>
+
 					<Dialog.Portal>
 						<Dialog.Overlay
-							class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80"
+							class="fixed inset-0 z-50 bg-black/80 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 						/>
 						<Dialog.Content
-							class="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 w-full max-w-xs translate-x-[-50%] translate-y-[-50%] rounded-xl border p-6 shadow-lg outline-none"
+							class="fixed top-[50%] left-[50%] z-50 w-full max-w-xs translate-x-[-50%] translate-y-[-50%] rounded-xl border bg-bg p-6 shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
 						>
 							<Dialog.Title class="mb-4 text-center text-lg font-semibold">
 								Thanks for contribution!
@@ -255,42 +235,36 @@
 			</div>
 
 			<!-- Social links -->
-			<div class="mt-4 space-y-2">
-				<h4 class="text-muted-foreground text-sm font-medium">
+			<div class="mt-10">
+				<h4 class="text-muted-foreground mb-4 text-sm font-medium">
 					Say Hi!
 					<span class="ml-2 text-sm">I'm always up for quick chat :)</span>
 				</h4>
-				<div class="flex gap-2">
-					<a
-						href="https://bsky.app/profile/jellydeck.bsky.social"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="bg-secondary text-secondary-foreground hover:bg-secondary/80 flex h-9 flex-1 items-center justify-center gap-2 rounded-md text-sm transition-colors"
+
+				<a
+					href="https://bsky.app/profile/jellydeck.bsky.social"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex items-center justify-center gap-2 rounded-md text-sm transition-colors"
+				>
+					<!-- Bluesky -->
+					<svg fill="none" viewBox="0 0 64 57" width={20} height={20}
+						><path
+							fill="#0F73FF"
+							d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55v15.882c0-.338-.13.044-.41.867-1.512 4.456-7.418 21.847-20.923 7.944-7.111-7.32-3.819-14.64 9.125-16.85-7.405 1.264-15.73-.825-18.014-9.015C1.12 23.022 0 8.51 0 6.55 0-3.268 8.579-.182 13.873 3.805ZM50.127 3.805C42.79 9.332 34.897 20.537 32 26.55v15.882c0-.338.13.044.41.867 1.512 4.456 7.418 21.847 20.923 7.944 7.111-7.32 3.819-14.64-9.125-16.85 7.405 1.264 15.73-.825 18.014-9.015C62.88 23.022 64 8.51 64 6.55c0-9.818-8.578-6.732-13.873-2.745Z"
+						></path></svg
 					>
-						<!-- Bluesky has no Phosphor icon — inline SVG -->
-						<svg
-							width="16"
-							height="16"
-							viewBox="0 0 360 320"
-							fill="currentColor"
-							aria-hidden="true"
-						>
-							<path
-								d="M180 142c-16-79-79-131-130-131C20 11 0 45 0 80c0 30 13 54 35 64C14 148 0 168 0 192c0 37 28 64 65 64 41 0 75-26 96-64 7-13 13-27 19-42 6 15 12 29 19 42 21 38 55 64 96 64 37 0 65-27 65-64 0-24-14-44-35-48 22-10 35-34 35-64 0-35-20-69-50-69-51 0-114 52-130 131z"
-							/>
-						</svg>
-						Bluesky
-					</a>
-					<a
-						href="https://x.com/JellyDeck"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="bg-secondary text-secondary-foreground hover:bg-secondary/80 flex h-9 flex-1 items-center justify-center gap-2 rounded-md text-sm transition-colors"
-					>
-						<XLogoIcon size={16} />
-						Twitter
-					</a>
-				</div>
+					Bluesky
+				</a>
+				<a
+					href="https://x.com/JellyDeck"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="ml-4 inline-flex items-center justify-center gap-2 rounded-md text-sm transition-colors"
+				>
+					<XLogoIcon size={20} />
+					Twitter
+				</a>
 			</div>
 		</div>
 	</div>
@@ -302,7 +276,6 @@
 		<!-- Logo -->
 		<div class="flex items-center gap-4">
 			<div class="flex items-center">
-				<!-- <h1 class="text-primary text-xl font-bold">Moo</h1> -->
 				<a href="https://ko-fi.com/jaydipsanghani" target="_blank" rel="noopener noreferrer">
 					<CoffeeIcon
 						size={24}
@@ -311,7 +284,7 @@
 				</a>
 			</div>
 			{#if !isMobile}
-				<div class="text-muted-foreground flex items-center gap-2 text-sm">
+				<div class="text-muted-foreground flex items-center gap-2">
 					<span>crafted by</span>
 					<a
 						href="https://jaydip.me"
@@ -327,7 +300,12 @@
 
 		<!-- Actions -->
 		<div class="flex items-center gap-2">
-			<Button href="https://github.com/jellydeck/moocup" target="_blank" rel="noopener noreferrer">
+			<Button
+				variant="outlined"
+				href="https://github.com/jellydeck/moocup"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
 				<GithubLogoIcon size={20} weight="bold" /> Send us a star!
 			</Button>
 
@@ -336,16 +314,16 @@
 				<Dialog.Root bind:open={isDialogOpen}>
 					<Dialog.Trigger
 						disabled={!uploadedImage}
-						class="bg-primary text-primary-foreground hover:bg-primary/90 flex h-10 w-10 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+						class="flex h-10 w-10 items-center justify-center rounded-md bg-bg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						<DownloadSimpleIcon size={20} />
 					</Dialog.Trigger>
 					<Dialog.Portal>
 						<Dialog.Overlay
-							class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/80"
+							class="fixed inset-0 z-50 bg-black/80 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 						/>
 						<Dialog.Content
-							class="bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 flex h-[90vh] max-h-[90vh] w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] flex-col rounded-xl border shadow-lg outline-none"
+							class="bg-background fixed top-[50%] left-[50%] z-50 flex h-[90vh] max-h-[90vh] w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] flex-col rounded-xs border shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
 						>
 							<div class="flex shrink-0 items-center justify-between border-b p-4">
 								<Dialog.Title class="text-lg font-semibold">Export & Support</Dialog.Title>
@@ -368,9 +346,13 @@
 				<Popover.Root>
 					<Popover.Trigger>
 						{#snippet child({ props })}
-							<Button {...props} disabled={!uploadedImage}>
+							<Button {...props} disabled={!uploadedImage} class="group">
 								Export
-								<CaretDownIcon size={16} weight="bold" class="ms-2" />
+								<CaretDownIcon
+									size={16}
+									weight="bold"
+									class="ms-2 transition-transform duration-200 group-data-[state=open]:rotate-180"
+								/>
 							</Button>
 						{/snippet}
 					</Popover.Trigger>
@@ -378,7 +360,7 @@
 						<Popover.Content
 							align="end"
 							sideOffset={6}
-							class="bg-background z-50 w-[900px] rounded-2xl border p-6 shadow-lg outline-none"
+							class="z-50 mt-2 w-[900px] rounded-lg border border-accent bg-bg p-4 text-white shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
 						>
 							{@render exportOptions()}
 						</Popover.Content>

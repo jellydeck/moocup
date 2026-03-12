@@ -1,19 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,MONO@300..800,0..1,0..1&display=swap');
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
 :root {
-	--bg: #100d0b;
-	--text: #f6eae4;
-	--accent: #e8cff1;
+	--bg: #111210;
+	--text: #fab3e5;
+	--accent: #49034a;
 
-	--pine: #262913;
-	--pine-text: #6e803b;
+	--pine: #171e12;
+	--pine-text: #83837d;
 
 	--white: #f3efef;
 	--border: #232b21;
 
 	--mono: 0; /* Monospace: Sans (natural-width) or Mono (fixed-width) */
-	--casl: 0; /* Casual: Linear to Casual */
+	--casl: 1; /* Casual: Linear to Casual */
 }
 
 @theme inline {
@@ -38,4 +39,10 @@ body {
 	background: var(--bg);
 	color: var(--text);
 	font-family: 'Recursive', sans-serif;
+}
+
+@layer base {
+	a {
+		@apply underline hover:no-underline;
+	}
 }
