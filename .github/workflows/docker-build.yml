@@ -29,7 +29,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v7
+        uses: docker/setup-buildx-action@v4
 
       # Multiarch Docker build and push with BOTH version tag and latest
       - name: Build and push Docker image
