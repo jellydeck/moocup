@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { mockupStore } from '$lib/contexts/store.svelte';
-	import { Checkbox, Label, Slider, Tabs } from 'bits-ui';
+	import { Checkbox, Label, Tabs } from 'bits-ui';
+	import Slider from '$lib/components/Slider.svelte';
 	import Button from '$lib/components/Button.svelte';
 
 	import DotsSixVerticalIcon from 'phosphor-svelte/lib/DotsSixVerticalIcon';
 	import ArrowCounterClockwiseIcon from 'phosphor-svelte/lib/ArrowCounterClockwiseIcon';
-	import CheckIcon from 'phosphor-svelte/lib/CheckIcon';
+	import { CheckFatIcon } from 'phosphor-svelte';
 
 	let isDragging = $state(false);
 	let windowPosition = $state({
@@ -22,8 +23,6 @@
 	const devicePosition = $derived(mockupStore.devicePosition);
 	const fixedMargin = $derived(mockupStore.fixedMargin);
 	let scale = $derived(devicePosition.scale);
-
-	$inspect(fixedMargin);
 
 	let gridRef: HTMLDivElement | null = $state(null);
 
@@ -112,15 +111,15 @@
 	const setfixedMargin = (v: boolean) => mockupStore.setFixedMargin(v);
 
 	const positionBalls = [
-		{ style: 'left:25px;top:25px' },
-		{ style: 'right:25px;top:25px' },
-		{ style: 'left:25px;bottom:25px' },
-		{ style: 'right:25px;bottom:25px' },
-		{ style: 'left:50%;top:25px;transform:translateX(-50%)' },
-		{ style: 'left:50%;bottom:25px;transform:translateX(-50%)' },
-		{ style: 'left:25px;top:50%;transform:translateY(-50%)' },
-		{ style: 'right:25px;top:50%;transform:translateY(-50%)' },
-		{ style: 'left:50%;top:50%;transform:translate(-50%,-50%)' }
+		{ style: 'left:25px; top:25px' },
+		{ style: 'right:25px; top:25px' },
+		{ style: 'left:25px; bottom:25px' },
+		{ style: 'right:25px; bottom:25px' },
+		{ style: 'left:50%; top:25px; transform:translateX(-50%)' },
+		{ style: 'left:50%; bottom:25px; transform:translateX(-50%)' },
+		{ style: 'left:25px; top:50%; transform:translateY(-50%)' },
+		{ style: 'right:25px; top:50%; transform:translateY(-50%)' },
+		{ style: 'left:50%; top:50%; transform:translate(-50%,-50%)' }
 	];
 </script>
 
@@ -128,7 +127,6 @@
 
 <div class="z-40 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
 	<div class="bg-sidebar min-w-80 overflow-hidden rounded-2xl border border-border">
-		<!-- HEADER -->
 		<div
 			role="button"
 			tabindex="0"
@@ -152,7 +150,7 @@
 						{#snippet child({ props })}
 							<Button
 								{...props}
-								variant="outlined"
+								variant="filled"
 								active={activeTab === 'position'}
 								class="flex-1 rounded-l-2xl"
 							>
@@ -165,7 +163,7 @@
 						{#snippet child({ props })}
 							<Button
 								{...props}
-								variant="outlined"
+								variant="filled"
 								active={activeTab === 'margins'}
 								class="flex-1 rounded-r-2xl"
 							>
@@ -175,20 +173,19 @@
 					</Tabs.Trigger>
 				</Tabs.List>
 
-				<!-- POSITION TAB -->
 				<Tabs.Content value="position">
 					<div
 						bind:this={gridRef}
-						class="relative my-4 h-60 w-full overflow-hidden rounded-xl border border-border bg-accent/20"
+						class="relative my-4 h-60 w-full overflow-hidden rounded-xl border border-border bg-accent/10"
 					>
 						{#each positionBalls as ball, index (index)}
-							<button
-								class="absolute size-12 origin-center cursor-pointer rounded-full bg-text hover:scale-105 hover:bg-text/90"
+							<Button
+								variant="outlined"
+								class="absolute rounded-3xl p-6"
 								style={ball.style}
 								onclick={handleBallClick}
 								aria-label="select position"
-							>
-							</button>
+							></Button>
 						{/each}
 					</div>
 
@@ -198,31 +195,25 @@
 							<span>{scale.toFixed(1)}x</span>
 						</div>
 
-						<Slider.Root
+						<Slider
 							type="single"
 							min={0.1}
 							max={3}
 							step={0.1}
-							value={scale}
-							onValueChange={(v) => {
-								scale = v;
-								mockupStore.updateDevicePosition({ scale: v });
-							}}
-							class="flex w-full items-center"
-						>
-							<span class="relative h-2 w-full grow overflow-hidden rounded-full bg-border">
-								<Slider.Range class="absolute h-full bg-text" />
-							</span>
-
-							<Slider.Thumb index={0} class="size-5 rounded-full border bg-white" />
-						</Slider.Root>
+							bind:value={
+								() => scale,
+								(value) => {
+									scale = value;
+									mockupStore.updateDevicePosition({ scale: v });
+								}
+							}
+						/>
 					</div>
 				</Tabs.Content>
 
-				<!-- MARGINS TAB -->
 				<Tabs.Content value="margins">
-					<div class="mt-4 space-y-4">
-						<div class="flex items-center justify-between">
+					<div class="mt-6 space-y-2">
+						<div class="mx-1 flex items-center justify-between">
 							<Label.Root for="fixed-margin" class="text-sm font-medium">Fixed Margin</Label.Root>
 
 							<Checkbox.Root
@@ -235,14 +226,14 @@
 							>
 								{#snippet children({ checked })}
 									{#if checked}
-										<CheckIcon class="size-3 text-bg" weight="bold" />
+										<CheckFatIcon size={14} class="text-bg" weight="fill" />
 									{/if}
 								{/snippet}
 							</Checkbox.Root>
 						</div>
 
 						{#if fixedMargin}
-							<div class="flex gap-1 rounded-full bg-bg p-1 ring-2 ring-border">
+							<div class="flex gap-1 rounded-sm bg-bg p-1">
 								<Button
 									active={marginPreset === 'small'}
 									variant="outlined"

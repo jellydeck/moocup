@@ -95,14 +95,20 @@
 					<ToggleGroup.Root
 						type="single"
 						bind:value={exportFormat}
-						class="flex gap-1 rounded-full bg-pine/30 p-1 ring-2 ring-border"
+						class="flex gap-1 rounded-full bg-pine/30 p-1"
 					>
 						{#each ['PNG', 'JPEG', 'WebP'] as fmt (fmt)}
-							<ToggleGroup.Item
-								value={fmt}
-								class="flex-1 cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-accent/50 data-[state=on]:bg-accent data-[state=on]:text-text"
-							>
-								{fmt}
+							<ToggleGroup.Item value={fmt}>
+								{#snippet child({ props })}
+									<Button
+										{...props}
+										variant="outlined"
+										active={props['data-state'] === 'on'}
+										class="flex-1 first:rounded-l-2xl last:rounded-r-2xl"
+									>
+										{fmt}
+									</Button>
+								{/snippet}
 							</ToggleGroup.Item>
 						{/each}
 					</ToggleGroup.Root>
@@ -116,14 +122,20 @@
 					<ToggleGroup.Root
 						type="single"
 						bind:value={quality}
-						class="flex gap-1 rounded-full bg-pine/50 p-1 ring-2 ring-border"
+						class="flex gap-1 rounded-full bg-pine/50 p-1"
 					>
 						{#each [['1', 'Standard'], ['2', 'High'], ['3', 'Ultra']] as [val, label] (label)}
-							<ToggleGroup.Item
-								value={val}
-								class="flex-1 cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors hover:bg-accent/50 data-[state=on]:bg-accent data-[state=on]:text-text"
-							>
-								{label}
+							<ToggleGroup.Item value={val}>
+								{#snippet child({ props })}
+									<Button
+										{...props}
+										variant="outlined"
+										active={props['data-state'] === 'on'}
+										class="flex-1 first:rounded-l-2xl last:rounded-r-2xl"
+									>
+										{label}
+									</Button>
+								{/snippet}
 							</ToggleGroup.Item>
 						{/each}
 					</ToggleGroup.Root>
@@ -156,14 +168,14 @@
 			</a>
 		</div>
 
-		<!-- My Details -->
+		<!-- My Letter -->
 		<div
 			class={`rounded-3xl border-2 border-dotted border-accent/70 p-5 ${!isMobile ? 'order-1' : 'order-2'} group`}
 		>
 			<HeartIcon
 				size={20}
 				weight="duotone"
-				class="text-primary mb-4 transition-colors group-hover:animate-pulse"
+				class="mb-4 text-text transition-colors group-hover:animate-pulse"
 			/>
 
 			<div class="mb-4 space-y-1">
@@ -175,7 +187,7 @@
 						rel="noopener noreferrer"
 						class="text-primary mx-1 inline-flex items-center gap-1 underline hover:no-underline"
 					>
-						Jaydip <ArrowSquareOutIcon size={12} />
+						Jaydip
 					</a>
 				</p>
 				<p class="text-muted-foreground text-sm leading-relaxed">
@@ -201,7 +213,7 @@
 				<Dialog.Root bind:open={isUpiDialogOpen}>
 					<Dialog.Trigger>
 						{#snippet child({ props })}
-							<Button variant="outlined" {...props} disabled={!uploadedImage}>UPI (India)</Button>
+							<Button variant="outlined" {...props}>UPI (India)</Button>
 						{/snippet}
 					</Dialog.Trigger>
 
@@ -235,34 +247,34 @@
 			</div>
 
 			<!-- Social links -->
-			<div class="mt-10">
-				<h4 class="text-muted-foreground mb-4 text-sm font-medium">
+			<div class="mt-10 text-sm">
+				<h4 class="text-muted-foreground mb-4 font-medium">
 					Say Hi!
-					<span class="ml-2 text-sm">I'm always up for quick chat :)</span>
+					<span class="ml-2">I'm always up for quick chat :)</span>
 				</h4>
 
 				<a
-					href="https://bsky.app/profile/jellydeck.bsky.social"
+					href="https://bsky.app/profile/jaydip.me"
 					target="_blank"
 					rel="noopener noreferrer"
-					class="inline-flex items-center justify-center gap-2 rounded-md text-sm transition-colors"
+					class="inline-flex items-center justify-center gap-2 rounded-md transition-colors"
 				>
 					<!-- Bluesky -->
-					<svg fill="none" viewBox="0 0 64 57" width={20} height={20}
-						><path
-							fill="#0F73FF"
+					<svg fill="none" viewBox="0 0 64 57" width={20} height={20} class="text-text">
+						<path
+							fill="currentColor"
 							d="M13.873 3.805C21.21 9.332 29.103 20.537 32 26.55v15.882c0-.338-.13.044-.41.867-1.512 4.456-7.418 21.847-20.923 7.944-7.111-7.32-3.819-14.64 9.125-16.85-7.405 1.264-15.73-.825-18.014-9.015C1.12 23.022 0 8.51 0 6.55 0-3.268 8.579-.182 13.873 3.805ZM50.127 3.805C42.79 9.332 34.897 20.537 32 26.55v15.882c0-.338.13.044.41.867 1.512 4.456 7.418 21.847 20.923 7.944 7.111-7.32 3.819-14.64-9.125-16.85 7.405 1.264 15.73-.825 18.014-9.015C62.88 23.022 64 8.51 64 6.55c0-9.818-8.578-6.732-13.873-2.745Z"
-						></path></svg
-					>
+						></path>
+					</svg>
 					Bluesky
 				</a>
 				<a
-					href="https://x.com/JellyDeck"
+					href="https://x.com/jellydeck"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="ml-4 inline-flex items-center justify-center gap-2 rounded-md text-sm transition-colors"
 				>
-					<XLogoIcon size={20} />
+					<XLogoIcon size={20} class="text-text" />
 					Twitter
 				</a>
 			</div>
@@ -270,16 +282,26 @@
 	</div>
 {/snippet}
 
-<!-- ─── Navbar ─────────────────────────────────────────────── -->
 <div class="bg-background/80 sticky top-0 z-50 border-b border-border">
 	<div class="flex h-16 items-center justify-between px-4 lg:mx-40">
 		<!-- Logo -->
 		<div class="flex items-center gap-4">
 			<div class="flex items-center">
-				<a href="https://ko-fi.com/jaydipsanghani" target="_blank" rel="noopener noreferrer">
+				<a
+					href="https://ko-fi.com/jaydipsanghani"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="group"
+				>
 					<CoffeeIcon
 						size={24}
-						class="text-primary hover:text-primary/80 cursor-pointer transition-transform hover:rotate-12"
+						weight="regular"
+						class="text-primary transition-transform group-hover:hidden group-hover:rotate-12"
+					/>
+					<CoffeeIcon
+						size={24}
+						weight="duotone"
+						class="text-primary hidden transition-transform group-hover:block group-hover:rotate-12"
 					/>
 				</a>
 			</div>
@@ -310,10 +332,8 @@
 			</Button>
 
 			{#if isMobile}
-				<!-- Mobile: Dialog -->
 				<Dialog.Root bind:open={isDialogOpen}>
 					<Dialog.Trigger
-						disabled={!uploadedImage}
 						class="flex h-10 w-10 items-center justify-center rounded-md bg-bg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						<DownloadSimpleIcon size={20} />
@@ -342,25 +362,26 @@
 					</Dialog.Portal>
 				</Dialog.Root>
 			{:else}
-				<!-- Desktop: Popover -->
 				<Popover.Root>
 					<Popover.Trigger>
-						{#snippet child({ props })}
-							<Button {...props} disabled={!uploadedImage} class="group">
-								Export
-								<CaretDownIcon
-									size={16}
-									weight="bold"
-									class="ms-2 transition-transform duration-200 group-data-[state=open]:rotate-180"
-								/>
-							</Button>
-						{/snippet}
+						<Button
+							class="group data-[active=true]:translate-y-px data-[state=open]:bg-accent data-[state=open]:text-white data-[state=open]:inset-shadow-[0_3px_3px_0]  data-[state=open]:inset-shadow-bg/80"
+						>
+							Export
+							<CaretDownIcon
+								size={16}
+								weight="bold"
+								class="ms-2 transition-transform duration-200 group-data-[state=open]:rotate-180"
+							/>
+						</Button>
 					</Popover.Trigger>
 					<Popover.Portal>
 						<Popover.Content
 							align="end"
 							sideOffset={6}
-							class="z-50 mt-2 w-[900px] rounded-lg border border-accent bg-bg p-4 text-white shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
+							class="z-50 mt-2 w-225 rounded-lg border border-border bg-bg p-4 text-white shadow-lg outline-none
+							data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1
+							data-[state=open]:animate-in data-[state=open]:slide-in-from-top-1"
 						>
 							{@render exportOptions()}
 						</Popover.Content>

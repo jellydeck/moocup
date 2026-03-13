@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { mockupStore } from '$lib/contexts/store.svelte';
-	import { Slider } from 'bits-ui';
 
 	import DotsSixVerticalIcon from 'phosphor-svelte/lib/DotsSixVerticalIcon';
 	import ArrowCounterClockwiseIcon from 'phosphor-svelte/lib/ArrowCounterClockwiseIcon';
@@ -10,8 +9,7 @@
 	import CubeIcon from 'phosphor-svelte/lib/CubeIcon';
 	import ArrowUpIcon from 'phosphor-svelte/lib/ArrowUpIcon';
 	import Button from '$lib/components/Button.svelte';
-
-	let { onClose }: { onClose?: () => void } = $props();
+	import Slider from '$lib/components/Slider.svelte';
 
 	let isDragging = $state(false);
 
@@ -77,10 +75,7 @@
 <svelte:window onmousemove={handleWindowDrag} onmouseup={handleWindowDragEnd} />
 
 <div class="z-40 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
-	<div
-		class="bg-sidebar border-sidebar-border min-w-80 overflow-hidden rounded-2xl border max-md:border-none"
-	>
-		<!-- HEADER -->
+	<div class="min-w-80 overflow-hidden rounded-2xl border border-border bg-bg max-md:border-none">
 		<div
 			role="button"
 			tabindex="0"
@@ -97,7 +92,6 @@
 			</Button>
 		</div>
 
-		<!-- BODY -->
 		<div class="space-y-6 bg-bg p-6">
 			<div class="space-y-4">
 				<!-- Rotate X -->
@@ -107,26 +101,13 @@
 					</div>
 
 					<div class="flex-1">
-						<Slider.Root
+						<Slider
 							type="single"
 							min={-45}
 							max={45}
 							step={1}
-							value={rotation3D.rotateX}
-							onValueChange={(v) => updateRotation('rotateX', v)}
-							class="relative flex w-full touch-none items-center select-none"
-						>
-							<span
-								class="relative h-2 w-full grow cursor-pointer overflow-hidden rounded-full bg-pine-text"
-							>
-								<Slider.Range class="absolute h-full bg-text" />
-							</span>
-
-							<Slider.Thumb
-								index={0}
-								class="block size-5 cursor-pointer rounded-full border border-white bg-white shadow"
-							/>
-						</Slider.Root>
+							bind:value={() => rotation3D.rotateX, (value) => updateRotation('rotateX', value)}
+						/>
 					</div>
 
 					<span class="w-8 text-right text-sm text-white">
@@ -141,23 +122,13 @@
 					</div>
 
 					<div class="flex-1">
-						<Slider.Root
+						<Slider
 							type="single"
 							min={-45}
 							max={45}
 							step={1}
-							value={rotation3D.rotateY}
-							onValueChange={(v) => updateRotation('rotateY', v)}
-							class="relative flex w-full items-center"
-						>
-							<span
-								class="relative h-2 w-full grow cursor-pointer overflow-hidden rounded-full bg-pine-text"
-							>
-								<Slider.Range class="absolute h-full bg-text" />
-							</span>
-
-							<Slider.Thumb index={0} class="size-5 rounded-full border border-white bg-white" />
-						</Slider.Root>
+							bind:value={() => rotation3D.rotateY, (value) => updateRotation('rotateY', value)}
+						/>
 					</div>
 
 					<span class="w-8 text-right text-sm text-white">
@@ -172,23 +143,13 @@
 					</div>
 
 					<div class="flex-1">
-						<Slider.Root
+						<Slider
 							type="single"
-							min={-180}
-							max={180}
+							min={-45}
+							max={45}
 							step={1}
-							value={rotation3D.rotateZ}
-							onValueChange={(v) => updateRotation('rotateZ', v)}
-							class="relative flex w-full items-center"
-						>
-							<span
-								class="relative h-2 w-full grow cursor-pointer overflow-hidden rounded-full bg-pine-text"
-							>
-								<Slider.Range class="absolute h-full bg-text" />
-							</span>
-
-							<Slider.Thumb index={0} class="size-5 rounded-full border border-white bg-white" />
-						</Slider.Root>
+							bind:value={() => rotation3D.rotateZ, (value) => updateRotation('rotateZ', value)}
+						/>
 					</div>
 
 					<span class="w-8 text-right text-sm text-white">
@@ -203,23 +164,13 @@
 					</div>
 
 					<div class="flex-1">
-						<Slider.Root
+						<Slider
 							type="single"
 							min={0}
 							max={45}
 							step={1}
-							value={rotation3D.skew}
-							onValueChange={(v) => updateRotation('skew', v)}
-							class="relative flex w-full items-center"
-						>
-							<span
-								class="relative h-2 w-full grow cursor-pointer overflow-hidden rounded-full bg-pine-text"
-							>
-								<Slider.Range class="absolute h-full bg-text" />
-							</span>
-
-							<Slider.Thumb index={0} class="size-5 rounded-full border border-white bg-white" />
-						</Slider.Root>
+							bind:value={() => rotation3D.skew, (value) => updateRotation('skew', value)}
+						/>
 					</div>
 
 					<span class="w-8 text-right text-sm text-white">
@@ -228,23 +179,23 @@
 				</div>
 			</div>
 
-			<!-- PRESETS -->
 			<div class="grid grid-cols-3 gap-2">
 				{#each presets as preset, index (index)}
-					<button
+					<Button
+						variant="outlined"
 						onclick={() => mockupStore.set3DRotation(preset)}
-						class="flex h-16 flex-col items-center justify-center rounded-lg border border-border bg-bg perspective-near hover:bg-accent/50"
+						class="h-16 rounded-lg perspective-near"
 					>
 						<div
-							class="relative mb-1 flex h-8 w-10 items-center justify-center rounded-sm bg-accent [&>svg]:text-text"
+							class="relative mb-1 flex h-8 w-10 items-center justify-center rounded-sm border border-text bg-accent [&>svg]:text-text"
 							style="transform:
 								rotateX({preset.rotateX}deg)
 								rotateY({preset.rotateY}deg)
 								rotateZ({preset.rotateZ}deg)"
 						>
-							<ArrowUpIcon size={18} />
+							<ArrowUpIcon size={18} weight="bold" />
 						</div>
-					</button>
+					</Button>
 				{/each}
 			</div>
 		</div>

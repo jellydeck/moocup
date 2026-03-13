@@ -10,6 +10,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import RotationSkewPanel from './RotationSkewPanel.svelte';
 	import PositionScalePanel from './PositionScalePanel.svelte';
+	import ImageBorderPanel from './ImageBorderPanel.svelte';
 
 	let activePanel = $state<string | null>(null);
 
@@ -44,7 +45,6 @@
 
 <svelte:window on:resize={handleResize} />
 
-<!-- MOBILE -->
 {#if isMobile}
 	<div
 		class="bg-sidebar border-sidebar-border fixed right-0 bottom-0 left-0 flex h-20 items-center justify-between border-t px-4"
@@ -84,7 +84,6 @@
 		</div>
 	</div>
 {:else}
-	<!-- DESKTOP FLOATING BAR -->
 	<div class="fixed bottom-6 left-[38%] z-30 -translate-x-1/2">
 		<div
 			class="flex items-center gap-1 rounded-full border-2 border-border bg-bg p-1.5 shadow-2xl backdrop-blur-lg"
@@ -134,6 +133,7 @@
 {#if activePanel === 'position'}
 	<PositionScalePanel />
 {/if}
-<!-- {#if activePanel === 'border'}
+
+{#if activePanel === 'border'}
 	<ImageBorderPanel />
-{/if} -->
+{/if}

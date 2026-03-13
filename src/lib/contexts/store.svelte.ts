@@ -80,6 +80,11 @@ class MockupStore {
 		this.#save();
 	}
 
+	resetDevicePosition() {
+		this.devicePosition = { x: 0, y: 0, scale: 1, rotation: 0 };
+		this.#save();
+	}
+
 	set3DRotation(v: Partial<typeof this.rotation3D>) {
 		this.rotation3D = { ...this.rotation3D, ...v };
 		this.#save();

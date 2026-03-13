@@ -11,16 +11,7 @@
 	let fileInputRef = $state<HTMLInputElement | null>(null);
 	let isDragOver = $state(false);
 	let showPasteHint = $state(false);
-
-	/* ---------------- viewport ---------------- */
-
-	let viewport = $state({
-		width: 0,
-		height: 0
-	});
-
-	/* ---------------- image natural size ---------------- */
-
+	let viewport = $state({ width: 0, height: 0 });
 	let naturalSize = $state<{ w: number; h: number } | null>(null);
 
 	$effect(() => {
@@ -32,24 +23,16 @@
 
 		const img = new Image();
 		img.onload = () => {
-			naturalSize = {
-				w: img.naturalWidth,
-				h: img.naturalHeight
-			};
+			naturalSize = { w: img.naturalWidth, h: img.naturalHeight };
 		};
 		img.src = src;
 	});
 
-	/* ---------------- layout (ALL responsive logic) ---------------- */
+	/* ---------------- layout ---------------- */
 
 	const layout = $derived.by(() => {
 		if (!naturalSize) {
-			return {
-				width: 400,
-				height: 300,
-				canvasWidth: '100%',
-				canvasHeight: '100%'
-			};
+			return { width: 400, height: 300, canvasWidth: '100%', canvasHeight: '100%' };
 		}
 
 		const vw = viewport.width;
@@ -80,56 +63,48 @@
 
 		if (mockupStore.fixedMargin && mockupStore.uploadedImage) {
 			canvasWidth = width + mockupStore.margin.left + mockupStore.margin.right + 'px';
-
 			canvasHeight = height + mockupStore.margin.top + mockupStore.margin.bottom + 'px';
 		}
 
-		return {
-			width,
-			height,
-			canvasWidth,
-			canvasHeight
-		};
+		return { width, height, canvasWidth, canvasHeight };
 	});
 
 	/* ---------------- styles ---------------- */
 
 	const backgroundStyle = $derived.by(() => {
-		const s = mockupStore;
-
-		if (s.backgroundImage) {
+		if (mockupStore.backgroundImage) {
 			return `
-    				background-image:url(${s.backgroundImage});
-    				background-size:cover;
-    				background-position:center;
-    				background-repeat:no-repeat;
-    				width:100%;
-    				height:100%;
-    			`;
+				background-image:url(${mockupStore.backgroundImage});
+				background-size:cover;
+				background-position:center;
+				background-repeat:no-repeat;
+				width:100%;
+				height:100%;
+			`;
 		}
 	});
 
 	const imageContainerStyle = $derived.by(() => {
 		if (mockupStore.fixedMargin && mockupStore.uploadedImage) {
 			return `
-    				position:absolute;
-    				top:${mockupStore.margin.top}px;
-    				right:${mockupStore.margin.right}px;
-    				bottom:${mockupStore.margin.bottom}px;
-    				left:${mockupStore.margin.left}px;
-    				display:flex;
-    				align-items:center;
-    				justify-content:center;
-    			`;
+				position:absolute;
+				top:${mockupStore.margin.top}px;
+				right:${mockupStore.margin.right}px;
+				bottom:${mockupStore.margin.bottom}px;
+				left:${mockupStore.margin.left}px;
+				display:flex;
+				align-items:center;
+				justify-content:center;
+			`;
 		}
 
 		return `
-    			display:flex;
-    			align-items:center;
-    			justify-content:center;
-    			width:100%;
-    			height:100%;
-    		`;
+			display:flex;
+			align-items:center;
+			justify-content:center;
+			width:100%;
+			height:100%;
+		`;
 	});
 
 	const imageStyle = $derived.by(() => {
@@ -137,31 +112,31 @@
 		const { rotateX, rotateY, rotateZ, skew } = mockupStore.rotation3D;
 
 		const transform = `
-    			translate(${x}px,${y}px)
-    			scale(${scale})
-    			rotate(${rotation}deg)
-    			rotateX(${rotateX}deg)
-    			rotateY(${rotateY}deg)
-    			rotateZ(${rotateZ}deg)
-    			skew(${skew}deg)
-    		`;
+			translate(${x}px,${y}px)
+			scale(${scale})
+			rotate(${rotation}deg)
+			rotateX(${rotateX}deg)
+			rotateY(${rotateY}deg)
+			rotateZ(${rotateZ}deg)
+			skew(${skew}deg)
+		`;
 
 		let style = `
-    			width:${layout.width}px;
-    			height:${layout.height}px;
-    			transform:${transform};
-    			transform-origin:center center;
-    			transform-style:preserve-3d;
-    		`;
+			width:${layout.width}px;
+			height:${layout.height}px;
+			transform:${transform};
+			transform-origin:center center;
+			transform-style:preserve-3d;
+		`;
 
 		const b = mockupStore.imageBorder;
 
 		if (b.enabled) {
 			style += `
-    				border:${b.width}px solid ${b.color};
-    				border-radius:${b.radius}px;
-    				box-shadow:${b.shadow};
-    			`;
+				border:${b.width}px solid ${b.color};
+				border-radius:${b.radius}px;
+				box-shadow:${b.shadow};
+			`;
 		}
 
 		return style;
@@ -242,19 +217,14 @@
 
 			img.onload = () => {
 				const canvas = document.createElement('canvas');
-
 				const ratio = Math.min(2400 / img.width, 1800 / img.height, 1);
-
 				canvas.width = Math.round(img.width * ratio);
 				canvas.height = Math.round(img.height * ratio);
-
 				canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
-
 				resolve(canvas.toDataURL('image/png'));
 			};
 
 			img.onerror = reject;
-
 			img.src = URL.createObjectURL(file);
 		});
 
@@ -263,14 +233,12 @@
 			file.size > 1024 * 1024 ? toast('Processing image...', { duration: Infinity }) : undefined;
 
 		const dataUrl = await toDataUrl(file);
-
 		mockupStore.setUploadedImage(dataUrl);
 
 		if (loadingToast) toast.dismiss(loadingToast);
 
 		try {
 			const dominant = await extractDominantColor(dataUrl);
-
 			applyBorder(/^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : undefined);
 		} catch {
 			applyBorder();
@@ -282,11 +250,9 @@
 	const onDrop = (e: DragEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-
 		isDragOver = false;
 
 		const file = Array.from(e.dataTransfer?.files ?? []).find((f) => f.type.startsWith('image/'));
-
 		if (file) {
 			localStorage.removeItem('demoImage');
 			uploadFile(file);
@@ -295,7 +261,6 @@
 
 	const onFileSelect = (e: Event) => {
 		const file = (e.target as HTMLInputElement).files?.[0];
-
 		if (file) {
 			localStorage.removeItem('demoImage');
 			uploadFile(file);
@@ -304,12 +269,9 @@
 
 	const onDemoImage = async (e: MouseEvent) => {
 		e.stopPropagation();
-
 		try {
 			const blob = await fetch(demoImage).then((r) => r.blob());
-
 			await uploadFile(new File([blob], 'demo.webp', { type: 'image/webp' }));
-
 			localStorage.setItem('demoImage', demoImage);
 		} catch {
 			toast.error('Failed to load demo image.');
@@ -317,6 +279,7 @@
 	};
 </script>
 
+<!-- ✅ Single svelte:window binding — both props on one object -->
 <svelte:window bind:innerWidth={viewport.width} bind:innerHeight={viewport.height} />
 
 <div
@@ -324,7 +287,7 @@
 	style={mockupStore.fixedMargin && mockupStore.uploadedImage ? 'background:black' : ''}
 >
 	<div
-		class="overflow-hidde relative transition-all duration-300"
+		class="relative overflow-hidden transition-all duration-300"
 		role="region"
 		style={`width:${layout.canvasWidth};height:${layout.canvasHeight}`}
 		data-mockup-canvas
@@ -405,8 +368,8 @@
 					</div>
 
 					<Button variant="filled" class="rounded-full!" onclick={onDemoImage}>
-						Use demo Image</Button
-					>
+						Use demo Image
+					</Button>
 				</div>
 			{/if}
 		</div>
