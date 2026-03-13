@@ -315,6 +315,10 @@
 					>
 						Jaydip
 					</a>
+
+					<div class="ml-1 flex w-60 flex-wrap rounded-md border border-border bg-accent/40 p-1">
+						new look, more coming soon
+					</div>
 				</div>
 			{/if}
 		</div>
