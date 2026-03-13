@@ -139,7 +139,7 @@
 			</div>
 
 			<Button onclick={resetPosition} variant="outlined">
-				<ArrowCounterClockwiseIcon size={16} />
+				<ArrowCounterClockwiseIcon size={16} weight="bold" />
 			</Button>
 		</div>
 

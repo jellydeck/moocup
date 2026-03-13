@@ -3,7 +3,6 @@
 	import DownloadSimpleIcon from 'phosphor-svelte/lib/DownloadSimpleIcon';
 	import CaretDownIcon from 'phosphor-svelte/lib/CaretDownIcon';
 	import CoffeeIcon from 'phosphor-svelte/lib/CoffeeIcon';
-	import ArrowSquareOutIcon from 'phosphor-svelte/lib/ArrowSquareOutIcon';
 	import SpinnerGapIcon from 'phosphor-svelte/lib/SpinnerGapIcon';
 	import HeartIcon from 'phosphor-svelte/lib/HeartIcon';
 	import XIcon from 'phosphor-svelte/lib/XIcon';
@@ -84,7 +83,7 @@
 		<!-- Controls -->
 		<div class={!isMobile ? 'order-2' : 'order-1'}>
 			<h3 class="text-foreground mb-6 flex items-center gap-2 text-xl font-semibold">
-				<DownloadSimpleIcon size={20} weight="fill" />
+				<DownloadSimpleIcon size={20} weight="bold" />
 				Export Options
 			</h3>
 
@@ -152,7 +151,7 @@
 					{#if isExporting}
 						<SpinnerGapIcon size={20} class="animate-spin" /> Exporting...
 					{:else}
-						<DownloadSimpleIcon size={20} /> Export as {exportFormat}
+						<DownloadSimpleIcon size={20} weight="bold" /> Export as {exportFormat}
 					{/if}
 				</Button>
 			</div>
@@ -164,7 +163,7 @@
 				class="text-muted-foreground hover:text-foreground mt-3 inline-flex w-full items-center justify-center gap-2 py-2 text-sm transition-colors"
 			>
 				<GithubLogoIcon size={20} />
-				Hey, You can also help us out here
+				If you like, You can also help us out here
 			</a>
 		</div>
 
@@ -205,7 +204,7 @@
 					rel="noopener noreferrer"
 					class="transition-colors"
 				>
-					<CoffeeIcon size={20} />
+					<CoffeeIcon size={20} weight="bold" />
 					Buy a coffee
 				</Button>
 
@@ -283,7 +282,7 @@
 {/snippet}
 
 <div class="bg-background/80 sticky top-0 z-50 border-b border-border">
-	<div class="flex h-16 items-center justify-between px-4 lg:mx-40">
+	<div class="flex h-16 items-center justify-between px-4 lg:mr-46 lg:ml-40">
 		<!-- Logo -->
 		<div class="flex items-center gap-4">
 			<div class="flex items-center">
@@ -336,7 +335,7 @@
 					<Dialog.Trigger
 						class="flex h-10 w-10 items-center justify-center rounded-md bg-bg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
 					>
-						<DownloadSimpleIcon size={20} />
+						<DownloadSimpleIcon size={20} weight="bold" />
 					</Dialog.Trigger>
 					<Dialog.Portal>
 						<Dialog.Overlay
