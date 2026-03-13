@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Recursive:wght,CASL,MONO@300..800,0..1,0..1&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+:root {
+	--bg: #111210;
+	--text: #fab3e5;
+	--accent: #6b0f6c;
+
+	--pine: #171e12;
+	--pine-text: #83837d;
+
+	--white: #f3efef;
+	--border: #232b21;
+
+	--mono: 0; /* Monospace: Sans (natural-width) or Mono (fixed-width) */
+	--casl: 1; /* Casual: Linear to Casual */
+}
+
+@theme inline {
+	--color-bg: var(--bg);
+	--color-text: var(--text);
+	--color-accent: var(--accent);
+
+	--color-pine: var(--pine);
+	--color-pine-text: var(--pine-text);
+
+	--color-white: var(--white);
+	--color-border: var(--border);
+}
+
+* {
+	font-variation-settings:
+		'MONO' var(--mono),
+		'CASL' var(--casl);
+}
+
+body {
+	background: var(--bg);
+	color: var(--text);
+	font-family: 'Recursive', sans-serif;
+}
+
+@layer base {
+	a {
+		@apply underline hover:no-underline;
+	}
+}
