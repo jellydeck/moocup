@@ -7,11 +7,17 @@
 	import Button from '$lib/components/Button.svelte';
 	import Slider from '$lib/components/Slider.svelte';
 	import Switch from '$lib/components/Switch.svelte';
+	import { XIcon } from 'phosphor-svelte';
+	import { browser } from '$app/environment';
+
+	const { onClose } = $props();
 
 	let isDragging = $state(false);
 	let windowPosition = $state({ x: 300, y: 100 });
 	let dragStart = $state({ x: 0, y: 0 });
 	let isLoadingColor = $state(false);
+	let isMobile = $state(browser ? window.innerWidth < 768 : false);
+
 	let imageBorder = $derived(mockupStore.imageBorder);
 	let uploadedImage = $derived(mockupStore.uploadedImage);
 	let initialRgba = $derived(parseRgba(imageBorder.color));
@@ -129,7 +135,7 @@
 
 <svelte:window onmousemove={handleWindowDrag} onmouseup={handleWindowDragEnd} />
 
-<div class="z-40 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
+<div class="z-60 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
 	<div class="min-w-80 overflow-hidden rounded-2xl border border-border bg-bg max-md:border-none">
 		<!-- HEADER -->
 		<div
@@ -142,9 +148,18 @@
 				<DotsSixVerticalIcon size={16} weight="bold" />
 				<span class="text-lg font-semibold text-white">Image Border</span>
 			</div>
-			<Button onclick={resetBorder} variant="outlined">
-				<ArrowCounterClockwiseIcon size={16} weight="bold" />
-			</Button>
+
+			<div>
+				<Button onclick={resetBorder} variant="outlined">
+					<ArrowCounterClockwiseIcon size={16} weight="bold" />
+				</Button>
+
+				{#if isMobile && onClose}
+					<Button onclick={onClose} variant="outlined">
+						<XIcon size={16} weight="bold" />
+					</Button>
+				{/if}
+			</div>
 		</div>
 
 		<div class="space-y-4 bg-bg p-6">

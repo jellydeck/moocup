@@ -14,6 +14,7 @@
 	import html2canvas from 'html2canvas';
 	import upiQR from '$lib/assets/upiQR.png';
 	import Button from '$lib/components/Button.svelte';
+	import { browser } from '$app/environment';
 
 	let exportFormat = $state('PNG');
 	let quality = $state('2');
@@ -23,7 +24,7 @@
 
 	const { uploadedImage } = $derived(mockupStore);
 
-	const isMobile = typeof window !== 'undefined' ? window.innerWidth < 768 : false;
+	let isMobile = $state(browser ? window.innerWidth < 768 : false);
 
 	async function exportImage(format: string, qualityMultiplier: number) {
 		if (!uploadedImage) return;
@@ -346,14 +347,14 @@
 							class="fixed inset-0 z-50 bg-black/80 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
 						/>
 						<Dialog.Content
-							class="bg-background fixed top-[50%] left-[50%] z-50 flex h-[90vh] max-h-[90vh] w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] flex-col rounded-xs border shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+							class="fixed top-[50%] left-[50%] z-50 flex h-[90vh] max-h-[90vh] w-[95vw] max-w-md translate-x-[-50%] translate-y-[-50%] flex-col rounded-xs border bg-bg shadow-lg outline-none data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
 						>
 							<div class="flex shrink-0 items-center justify-between border-b p-4">
 								<Dialog.Title class="text-lg font-semibold">Export & Support</Dialog.Title>
 								<Dialog.Close
 									class="flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-accent"
 								>
-									<XIcon size={16} />
+									<XIcon size={16} weight="bold" />
 								</Dialog.Close>
 							</div>
 							<div class="flex-1 overflow-y-auto">

@@ -6,7 +6,12 @@
 
 	import DotsSixVerticalIcon from 'phosphor-svelte/lib/DotsSixVerticalIcon';
 	import ArrowCounterClockwiseIcon from 'phosphor-svelte/lib/ArrowCounterClockwiseIcon';
-	import { CheckFatIcon } from 'phosphor-svelte';
+	import CheckFatIcon from 'phosphor-svelte/lib/CheckFatIcon';
+	import XIcon from 'phosphor-svelte/lib/XIcon';
+
+	import { browser } from '$app/environment';
+
+	const { onClose } = $props();
 
 	let isDragging = $state(false);
 	let windowPosition = $state({
@@ -19,6 +24,7 @@
 	});
 	let activeTab = $state<'position' | 'margins'>('position');
 	let marginPreset = $state<'small' | 'medium' | 'large' | ''>('medium');
+	let isMobile = $state(browser ? window.innerWidth < 768 : false);
 
 	const devicePosition = $derived(mockupStore.devicePosition);
 	const fixedMargin = $derived(mockupStore.fixedMargin);
@@ -125,7 +131,7 @@
 
 <svelte:window onmousemove={handleWindowDrag} onmouseup={handleWindowDragEnd} />
 
-<div class="z-40 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
+<div class="z-60 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
 	<div class="bg-sidebar min-w-80 overflow-hidden rounded-2xl border border-border">
 		<div
 			role="button"
@@ -138,9 +144,17 @@
 				<span class="text-lg font-semibold text-white">Position / Scale</span>
 			</div>
 
-			<Button onclick={resetPosition} variant="outlined">
-				<ArrowCounterClockwiseIcon size={16} weight="bold" />
-			</Button>
+			<div>
+				<Button onclick={resetPosition} variant="outlined">
+					<ArrowCounterClockwiseIcon size={16} weight="bold" />
+				</Button>
+
+				{#if isMobile && onClose}
+					<Button onclick={onClose} variant="outlined">
+						<XIcon size={16} weight="bold" />
+					</Button>
+				{/if}
+			</div>
 		</div>
 
 		<div class="space-y-4 bg-bg p-6">

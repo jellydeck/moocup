@@ -10,8 +10,13 @@
 	import ArrowUpIcon from 'phosphor-svelte/lib/ArrowUpIcon';
 	import Button from '$lib/components/Button.svelte';
 	import Slider from '$lib/components/Slider.svelte';
+	import { XIcon } from 'phosphor-svelte';
+	import { browser } from '$app/environment';
+
+	const { onClose } = $props();
 
 	let isDragging = $state(false);
+	let isMobile = $state(browser ? window.innerWidth < 768 : false);
 
 	let windowPosition = $state({
 		x: 100,
@@ -74,7 +79,7 @@
 
 <svelte:window onmousemove={handleWindowDrag} onmouseup={handleWindowDragEnd} />
 
-<div class="z-40 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
+<div class="z-60 select-none md:fixed" style="left:{windowPosition.x}px; top:{windowPosition.y}px">
 	<div class="min-w-80 overflow-hidden rounded-2xl border border-border bg-bg max-md:border-none">
 		<div
 			role="button"
@@ -87,9 +92,17 @@
 				<span class="text-lg font-semibold text-white">Rotation & Skew</span>
 			</div>
 
-			<Button onclick={resetRotation} variant="outlined">
-				<ArrowCounterClockwiseIcon size={16} weight="bold" />
-			</Button>
+			<div>
+				<Button onclick={resetRotation} variant="outlined">
+					<ArrowCounterClockwiseIcon size={16} weight="bold" />
+				</Button>
+
+				{#if isMobile && onClose}
+					<Button onclick={onClose} variant="outlined">
+						<XIcon size={16} weight="bold" />
+					</Button>
+				{/if}
+			</div>
 		</div>
 
 		<div class="space-y-6 bg-bg p-6">

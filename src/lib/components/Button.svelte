@@ -13,15 +13,15 @@
 		variants: {
 			variant: {
 				filled: [
-					'bg-text text-bg disabled:bg-text/30',
+					'bg-text text-bg disabled:bg-text/30 backdrop-blur-md',
 					'hover:bg-accent/60 hover:text-white',
-					'hover:inset-shadow-[0_2px_3px_0] hover:inset-shadow-bg/80',
+					'active:inset-shadow-[0_2px_3px_0] active:inset-shadow-bg/80',
 					'data-[active=true]:translate-y-px data-[active=true]:bg-accent',
 					'data-[active=true]:text-white data-[active=true]:inset-shadow-[0_3px_3px_0]',
 					'data-[active=true]:inset-shadow-bg/80'
 				],
 				outlined: [
-					'border-2 border-accent/50 bg-transparent text-text disabled:opacity-50',
+					'border-2 border-accent/50 bg-transparent text-text disabled:opacity-50 backdrop-blur-md',
 					'hover:bg-accent/40 hover:inset-shadow-[0_3px_3px_0] hover:inset-shadow-bg/80',
 					'data-[active=true]:translate-y-px data-[active=true]:bg-accent',
 					'data-[active=true]:inset-shadow-[0_3px_3px_0] data-[active=true]:inset-shadow-bg/80'

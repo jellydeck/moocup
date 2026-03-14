@@ -11,12 +11,13 @@
 	import RotationSkewPanel from './RotationSkewPanel.svelte';
 	import PositionScalePanel from './PositionScalePanel.svelte';
 	import ImageBorderPanel from './ImageBorderPanel.svelte';
+	import { browser } from '$app/environment';
 
 	let activePanel = $state<string | null>(null);
 
-	let isMobile = $state(false);
+	let isMobile = $state(browser ? window.innerWidth < 768 : false);
 
-	const hasImage = $derived(!!mockupStore.uploadedImage);
+	let hasImage = $derived(!!mockupStore.uploadedImage);
 
 	function handleReset() {
 		mockupStore.setMargin({ top: 0, right: 0, bottom: 0, left: 0 });
@@ -45,45 +46,29 @@
 
 <svelte:window on:resize={handleResize} />
 
-{#if isMobile}
+{#if isMobile && hasImage}
 	<div
-		class="bg-sidebar border-sidebar-border fixed right-0 bottom-0 left-0 flex h-20 items-center justify-between border-t px-4"
+		class="fixed right-0 bottom-0 left-0 flex h-20 items-center justify-between border-t border-border bg-bg px-4"
 	>
-		<div class="flex items-center gap-2">
-			<button
-				onclick={handleReset}
-				disabled={!hasImage}
-				class="hover:text-primary hover:bg-primary/20 rounded-full p-3 text-white"
-			>
-				<ArrowLeftIcon size={16} />
-			</button>
+		<div class="flex w-full gap-2">
+			<Button onclick={handleReset} disabled={!hasImage} class="flex-1" variant="outlined">
+				<BroomIcon size={16} weight="bold" />
+			</Button>
 
-			<button
-				onclick={() => togglePanel('rotation')}
-				disabled={!hasImage}
-				class="hover:bg-primary/20 rounded-full p-3 text-white"
-			>
-				<PerspectiveIcon class="h-6 w-6" />
-			</button>
+			<Button onclick={() => togglePanel('rotation')} disabled={!hasImage} class="flex-1">
+				<PerspectiveIcon size={16} weight="bold" />
+			</Button>
 
-			<button
-				onclick={() => togglePanel('position')}
-				disabled={!hasImage}
-				class="hover:bg-primary/20 rounded-full p-3 text-white"
-			>
-				<ArrowsOutCardinalIcon class="h-6 w-6" />
-			</button>
+			<Button onclick={() => togglePanel('position')} disabled={!hasImage} class="flex-1">
+				<ArrowsOutCardinalIcon size={16} weight="bold" />
+			</Button>
 
-			<button
-				onclick={() => togglePanel('border')}
-				disabled={!hasImage}
-				class="hover:bg-primary/20 rounded-full p-3 text-white"
-			>
-				<SelectionIcon class="h-6 w-6" />
-			</button>
+			<Button onclick={() => togglePanel('border')} disabled={!hasImage} class="flex-1">
+				<SelectionIcon size={16} weight="bold" />
+			</Button>
 		</div>
 	</div>
-{:else}
+{:else if hasImage}
 	<div class="fixed bottom-6 left-[38%] z-30 -translate-x-1/2">
 		<div
 			class="flex items-center gap-1 rounded-full border-2 border-border bg-bg p-1.5 shadow-2xl backdrop-blur-lg"
@@ -93,7 +78,7 @@
 				Reset
 			</Button>
 
-			<Separator.Root orientation="vertical" class="bg-primary/40 mx-1 h-6" />
+			<Separator.Root orientation="vertical" class="mx-1 h-6 bg-border" />
 
 			<Button
 				onclick={() => togglePanel('rotation')}
@@ -127,13 +112,13 @@
 {/if}
 
 {#if activePanel === 'rotation'}
-	<RotationSkewPanel />
+	<RotationSkewPanel onClose={() => (activePanel = null)} />
 {/if}
 
 {#if activePanel === 'position'}
-	<PositionScalePanel />
+	<PositionScalePanel onClose={() => (activePanel = null)} />
 {/if}
 
 {#if activePanel === 'border'}
-	<ImageBorderPanel />
+	<ImageBorderPanel onClose={() => (activePanel = null)} />
 {/if}

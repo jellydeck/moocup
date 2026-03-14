@@ -24,6 +24,7 @@
 	import arcticPulse from '$lib/assets/arctic_pulse.webp';
 	import moltenDusk from '$lib/assets/molten_dusk.webp';
 	import twilightEmber from '$lib/assets/twilight_ember.webp';
+	import Button from '$lib/components/Button.svelte';
 
 	interface GradientPreset {
 		name: string;
@@ -39,6 +40,7 @@
 	let isDialogOpen = $state(false);
 	let isDragOver = $state(false);
 	let fileInputRef = $state<HTMLInputElement | null>(null);
+	let hasImage = $derived(!!mockupStore.uploadedImage);
 
 	const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -139,6 +141,7 @@
 {#snippet gradientGrid()}
 	<div class="flex flex-col gap-3">
 		<h3 class="text-sm font-medium text-pine-text">Background Gradients</h3>
+
 		<div class="grid grid-cols-1 gap-3 max-md:grid-cols-2 md:grid-cols-1">
 			<!-- Custom upload button -->
 			<button
@@ -174,15 +177,17 @@
 {/snippet}
 
 <!-- Mobile trigger (hidden on md+) -->
-<button
-	class="fixed right-4 bottom-24 z-50 flex cursor-pointer items-center gap-2
-	       rounded-full border border-accent bg-pine px-4 py-2 text-sm
-	       font-medium text-pine-text md:hidden"
-	onclick={() => (isSheetOpen = true)}
->
-	<CaretUpIcon size={18} weight="bold" />
-	Background Gradients
-</button>
+{#if hasImage}
+	<Button
+		class="fixed right-4 bottom-24 z-50 gap-2
+	       rounded-full px-4 py-2 text-sm
+	        md:hidden"
+		onclick={() => (isSheetOpen = true)}
+	>
+		<CaretUpIcon size={18} weight="bold" />
+		Background Gradients
+	</Button>
+{/if}
 
 <!-- Mobile bottom sheet -->
 <Dialog.Root bind:open={isSheetOpen}>
@@ -191,9 +196,8 @@
 		<Dialog.Content
 			class="fixed right-0 bottom-0 left-0 z-50 flex h-[80vh] flex-col
 			       rounded-t-2xl border-t border-border bg-bg outline-none"
-			aria-describedby={undefined}
 		>
-			<!-- drag handle -->
+			<!-- handle -->
 			<div class="flex justify-center pt-3 pb-1">
 				<div class="h-1.5 w-12 rounded-full bg-border"></div>
 			</div>
