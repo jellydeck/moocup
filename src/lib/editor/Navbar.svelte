@@ -19,7 +19,7 @@
 	let exportFormat = $state('PNG');
 	let quality = $state('2');
 	let isExporting = $state(false);
-	let isDialogOpen = $state(true);
+	let isDialogOpen = $state(false);
 	let isUpiDialogOpen = $state(false);
 
 	const { uploadedImage } = $derived(mockupStore);

@@ -17,7 +17,7 @@
 					'hover:bg-accent/60 hover:text-white',
 					'disabled:bg-text/30',
 					'data-[active=true]:translate-y-px data-[active=true]:bg-accent',
-					'data-[active=true]:text-white data-[active=true]:inset-shadow-[0_3px_3px_0]',
+					'data-[active=true]:text-white data-[active=true]:inset-shadow-[0_2px_2px_0]',
 					'data-[active=true]:inset-shadow-bg/80'
 				],
 				outlined: [
