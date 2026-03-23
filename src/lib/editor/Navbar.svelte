@@ -318,7 +318,7 @@
 					</a>
 
 					<div class="ml-1 flex flex-wrap rounded-md border border-border bg-accent/40 p-1">
-						<a href="https://www.jaydip.me/blog/hello-svelte"> Why redesign the moocup?</a>
+						<a href="https://www.jaydip.me/blog/hello-svelte"> Why redesign?</a>
 					</div>
 				</div>
 			{/if}
