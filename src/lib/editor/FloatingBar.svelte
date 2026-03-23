@@ -2,7 +2,6 @@
 	import { mockupStore } from '$lib/contexts/store.svelte';
 	import { Separator } from 'bits-ui';
 
-	import ArrowLeftIcon from 'phosphor-svelte/lib/ArrowLeftIcon';
 	import PerspectiveIcon from 'phosphor-svelte/lib/PerspectiveIcon';
 	import ArrowsOutCardinalIcon from 'phosphor-svelte/lib/ArrowsOutCardinalIcon';
 	import SelectionIcon from 'phosphor-svelte/lib/SelectionIcon';
@@ -69,7 +68,7 @@
 		</div>
 	</div>
 {:else if hasImage}
-	<div class="fixed bottom-6 left-[38%] z-30 -translate-x-1/2">
+	<div class="absolute inset-x-auto bottom-6 z-30">
 		<div
 			class="flex items-center gap-1 rounded-full border-2 border-border bg-bg p-1.5 shadow-2xl backdrop-blur-lg"
 		>

@@ -7,6 +7,7 @@
 	import ImageIcon from 'phosphor-svelte/lib/ImageIcon';
 	import ClipboardIcon from 'phosphor-svelte/lib/ClipboardIcon';
 	import demoImage from '$lib/assets/demo.webp';
+	import FloatingBar from './FloatingBar.svelte';
 
 	let fileInputRef = $state<HTMLInputElement | null>(null);
 	let isDragOver = $state(false);
@@ -27,8 +28,6 @@
 		};
 		img.src = src;
 	});
-
-	/* ---------------- layout ---------------- */
 
 	const layout = $derived.by(() => {
 		if (!naturalSize) {
@@ -68,8 +67,6 @@
 
 		return { width, height, canvasWidth, canvasHeight };
 	});
-
-	/* ---------------- styles ---------------- */
 
 	const backgroundStyle = $derived.by(() => {
 		if (mockupStore.backgroundImage) {
@@ -142,8 +139,6 @@
 		return style;
 	});
 
-	/* ---------------- clipboard paste ---------------- */
-
 	$effect(() => {
 		const onPaste = async (e: ClipboardEvent) => {
 			const file = Array.from(e.clipboardData?.items ?? [])
@@ -178,8 +173,6 @@
 		document.addEventListener('paste', onPaste);
 		return () => document.removeEventListener('paste', onPaste);
 	});
-
-	/* ---------------- upload helpers ---------------- */
 
 	const hexToRgb = (hex: string) => ({
 		r: parseInt(hex.slice(1, 3), 16),
@@ -279,7 +272,6 @@
 	};
 </script>
 
-<!-- ✅ Single svelte:window binding — both props on one object -->
 <svelte:window bind:innerWidth={viewport.width} bind:innerHeight={viewport.height} />
 
 <div
@@ -382,4 +374,5 @@
 			class="hidden"
 		/>
 	</div>
+	<FloatingBar />
 </div>

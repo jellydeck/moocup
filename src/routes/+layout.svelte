@@ -3,7 +3,6 @@
 	import Navbar from '$lib/editor/Navbar.svelte';
 	import { mockupStore } from '$lib/contexts/store.svelte';
 	import { onMount } from 'svelte';
-	import FloatingBar from '$lib/editor/FloatingBar.svelte';
 
 	let { children } = $props();
 
@@ -35,8 +34,6 @@
 		<div class="flex flex-1 overflow-hidden">
 			{@render children()}
 		</div>
-
-		<FloatingBar />
 	</div>
 {:else}
 	<div class="grid h-screen place-items-center">
