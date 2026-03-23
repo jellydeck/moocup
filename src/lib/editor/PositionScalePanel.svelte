@@ -117,15 +117,17 @@
 	const setfixedMargin = (v: boolean) => mockupStore.setFixedMargin(v);
 
 	const positionBalls = [
-		{ style: 'left:25px; top:25px' },
-		{ style: 'right:25px; top:25px' },
-		{ style: 'left:25px; bottom:25px' },
-		{ style: 'right:25px; bottom:25px' },
-		{ style: 'left:50%; top:25px; transform:translateX(-50%)' },
-		{ style: 'left:50%; bottom:25px; transform:translateX(-50%)' },
-		{ style: 'left:25px; top:50%; transform:translateY(-50%)' },
-		{ style: 'right:25px; top:50%; transform:translateY(-50%)' },
-		{ style: 'left:50%; top:50%; transform:translate(-50%,-50%)' }
+		{ style: 'left:25px; top:25px' }, // top-left
+		{ style: 'left:50%; top:25px; transform:translateX(-50%)' }, // top-center
+		{ style: 'right:25px; top:25px' }, // top-right
+
+		{ style: 'left:25px; top:50%; transform:translateY(-50%)' }, // middle-left
+		{ style: 'left:50%; top:50%; transform:translate(-50%,-50%)' }, // center
+		{ style: 'right:25px; top:50%; transform:translateY(-50%)' }, // middle-right
+
+		{ style: 'left:25px; bottom:25px' }, // bottom-left
+		{ style: 'left:50%; bottom:25px; transform:translateX(-50%)' }, // bottom-center
+		{ style: 'right:25px; bottom:25px' } // bottom-right
 	];
 </script>
 
@@ -218,7 +220,7 @@
 								() => scale,
 								(value) => {
 									scale = value;
-									mockupStore.updateDevicePosition({ scale: v });
+									mockupStore.updateDevicePosition({ scale: value });
 								}
 							}
 						/>
