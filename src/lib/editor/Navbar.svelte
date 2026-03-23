@@ -368,16 +368,19 @@
 			{:else}
 				<Popover.Root>
 					<Popover.Trigger>
-						<Button
-							class="group data-[active=true]:translate-y-px data-[state=open]:bg-accent data-[state=open]:text-white data-[state=open]:inset-shadow-[0_3px_3px_0]  data-[state=open]:inset-shadow-bg/80"
-						>
-							Export
-							<CaretDownIcon
-								size={16}
-								weight="bold"
-								class="ms-2 transition-transform duration-200 group-data-[state=open]:rotate-180"
-							/>
-						</Button>
+						{#snippet child({ props })}
+							<Button
+								{...props}
+								class="group outline-none data-[active=true]:translate-y-px data-[state=open]:bg-accent data-[state=open]:text-white data-[state=open]:inset-shadow-[0_3px_3px_0] data-[state=open]:inset-shadow-bg/80"
+							>
+								Export
+								<CaretDownIcon
+									size={16}
+									weight="bold"
+									class="ms-2 transition-transform duration-200 group-data-[state=open]:rotate-180"
+								/>
+							</Button>
+						{/snippet}
 					</Popover.Trigger>
 					<Popover.Portal>
 						<Popover.Content
