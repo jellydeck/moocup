@@ -13,23 +13,9 @@
 	let isDragOver = $state(false);
 	let showPasteHint = $state(false);
 	let viewport = $state({ width: 0, height: 0 });
-	let naturalSize = $state<{ w: number; h: number } | null>(null);
-
-	$effect(() => {
-		const src = mockupStore.uploadedImage;
-		if (!src) {
-			naturalSize = null;
-			return;
-		}
-
-		const img = new Image();
-		img.onload = () => {
-			naturalSize = { w: img.naturalWidth, h: img.naturalHeight };
-		};
-		img.src = src;
-	});
 
 	const layout = $derived.by(() => {
+		const naturalSize = mockupStore.naturalSize;
 		if (!naturalSize) {
 			return { width: 400, height: 300, canvasWidth: '100%', canvasHeight: '100%' };
 		}
@@ -139,41 +125,6 @@
 		return style;
 	});
 
-	$effect(() => {
-		const onPaste = async (e: ClipboardEvent) => {
-			const file = Array.from(e.clipboardData?.items ?? [])
-				.find((i) => i.type.startsWith('image/'))
-				?.getAsFile();
-
-			if (!file) return;
-
-			if (mockupStore.uploadedImage) {
-				showPasteHint = true;
-
-				toast('Image in clipboard detected!', {
-					duration: 3000,
-					action: {
-						label: 'Clear & Paste',
-						onClick: () => {
-							mockupStore.setUploadedImage(null);
-							localStorage.removeItem('demoImage');
-							setTimeout(() => uploadFile(file), 100);
-						}
-					}
-				});
-
-				setTimeout(() => (showPasteHint = false), 3000);
-			} else {
-				await uploadFile(file);
-				localStorage.removeItem('demoImage');
-				toast('Image pasted successfully!');
-			}
-		};
-
-		document.addEventListener('paste', onPaste);
-		return () => document.removeEventListener('paste', onPaste);
-	});
-
 	const hexToRgb = (hex: string) => ({
 		r: parseInt(hex.slice(1, 3), 16),
 		g: parseInt(hex.slice(3, 5), 16),
@@ -226,7 +177,11 @@
 			file.size > 1024 * 1024 ? toast('Processing image...', { duration: Infinity }) : undefined;
 
 		const dataUrl = await toDataUrl(file);
-		mockupStore.setUploadedImage(dataUrl);
+
+		const img = new Image();
+		img.onload = () =>
+			mockupStore.setUploadedImage(dataUrl, { w: img.naturalWidth, h: img.naturalHeight });
+		img.src = dataUrl;
 
 		if (loadingToast) toast.dismiss(loadingToast);
 
@@ -260,19 +215,61 @@
 		}
 	};
 
+	const onPaste = async (e: ClipboardEvent) => {
+		const file = Array.from(e.clipboardData?.items ?? [])
+			.find((i) => i.type.startsWith('image/'))
+			?.getAsFile();
+
+		if (!file) return;
+
+		if (mockupStore.uploadedImage) {
+			showPasteHint = true;
+
+			toast('Image in clipboard detected!', {
+				duration: 3000,
+				action: {
+					label: 'Clear & Paste',
+					onClick: () => {
+						mockupStore.setUploadedImage(null);
+						localStorage.removeItem('demoImage');
+						setTimeout(() => uploadFile(file), 100);
+					}
+				}
+			});
+
+			setTimeout(() => (showPasteHint = false), 3000);
+		} else {
+			await uploadFile(file);
+			localStorage.removeItem('demoImage');
+			toast('Image pasted successfully!');
+		}
+	};
+
 	const onDemoImage = async (e: MouseEvent) => {
 		e.stopPropagation();
 		try {
-			const blob = await fetch(demoImage).then((r) => r.blob());
-			await uploadFile(new File([blob], 'demo.webp', { type: 'image/webp' }));
 			localStorage.setItem('demoImage', demoImage);
+
+			const img = new Image();
+			img.onload = () =>
+				mockupStore.setUploadedImage(demoImage, { w: img.naturalWidth, h: img.naturalHeight });
+			img.src = demoImage;
+
+			const dominant = await extractDominantColor(demoImage);
+			applyBorder(/^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : undefined);
+			toast('Image uploaded!');
 		} catch {
-			toast.error('Failed to load demo image.');
+			applyBorder();
+			toast('Image uploaded!');
 		}
 	};
 </script>
 
-<svelte:window bind:innerWidth={viewport.width} bind:innerHeight={viewport.height} />
+<svelte:window
+	bind:innerWidth={viewport.width}
+	bind:innerHeight={viewport.height}
+	onpaste={onPaste}
+/>
 
 <div
 	class="relative flex flex-1 items-center justify-center"
@@ -332,7 +329,7 @@
 				<div
 					role="button"
 					tabindex="0"
-					class="absolute top-1/4 left-1/2 flex h-[50%] w-[60%] -translate-x-1/2 flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-accent bg-black/40 max-md:h-[60%] max-md:w-[90%]"
+					class="absolute top-1/4 left-1/2 flex h-[50%] w-[60%] -translate-x-1/2 cursor-pointer flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-accent bg-black/40 max-md:h-[60%] max-md:w-[90%]"
 					ondrop={onDrop}
 					ondragover={(e) => {
 						e.preventDefault();

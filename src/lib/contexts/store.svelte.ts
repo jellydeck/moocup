@@ -32,6 +32,7 @@ async function idbSet(key: string, value: string): Promise<void> {
 // ── store ─────────────────────────────────────────────────────
 class MockupStore {
 	uploadedImage = $state<string | null>(null);
+	naturalSize = $state<{ w: number; h: number } | null>(null);
 	backgroundType = $state<'solid'>('solid');
 	backgroundImage = $state<string | null>(deepHorizon);
 	aspectRatio = $state('16:9');
@@ -50,8 +51,9 @@ class MockupStore {
 	hydrated = $state(false);
 
 	// ── actions ──────────────────────────────────────────────
-	setUploadedImage(v: string | null) {
+	setUploadedImage(v: string | null, size?: { w: number; h: number }) {
 		this.uploadedImage = v;
+		this.naturalSize = size ?? null;
 		this.#save();
 	}
 	setBackgroundType(v: 'solid') {
@@ -134,7 +136,15 @@ class MockupStore {
 			if (!raw) return;
 
 			const s = JSON.parse(raw);
-			if (s.uploadedImage !== undefined) this.uploadedImage = s.uploadedImage;
+			if (s.uploadedImage !== undefined) {
+				this.uploadedImage = s.uploadedImage;
+
+				if (s.uploadedImage) {
+					const img = new Image();
+					img.onload = () => (this.naturalSize = { w: img.naturalWidth, h: img.naturalHeight });
+					img.src = s.uploadedImage;
+				}
+			}
 			if (s.backgroundType !== undefined) this.backgroundType = s.backgroundType;
 			if (s.backgroundImage !== undefined) this.backgroundImage = s.backgroundImage;
 			if (s.aspectRatio !== undefined) this.aspectRatio = s.aspectRatio;
