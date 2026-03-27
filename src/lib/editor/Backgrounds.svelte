@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { toast } from 'svelte-sonner';
 	import { Dialog } from 'bits-ui';
 	import ImageIcon from 'phosphor-svelte/lib/ImageIcon';
 	import CaretUpIcon from 'phosphor-svelte/lib/CaretUpIcon';
@@ -91,7 +90,7 @@
 					image: base64Image
 				};
 				mockupStore.addCustomBackground(newBg);
-				toast('Background added successfully!');
+
 				setTimeout(() => (isDialogOpen = false), 300);
 				isDragOver = false;
 			}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { toast } from 'svelte-sonner';
 	import { mockupStore } from '$lib/contexts/store.svelte';
 	import Button from '$lib/components/Button.svelte';
 	import { extractDominantColor } from '$lib/utils';
@@ -173,9 +172,6 @@
 		});
 
 	const uploadFile = async (file: File) => {
-		const loadingToast =
-			file.size > 1024 * 1024 ? toast('Processing image...', { duration: Infinity }) : undefined;
-
 		const dataUrl = await toDataUrl(file);
 
 		const img = new Image();
@@ -183,16 +179,12 @@
 			mockupStore.setUploadedImage(dataUrl, { w: img.naturalWidth, h: img.naturalHeight });
 		img.src = dataUrl;
 
-		if (loadingToast) toast.dismiss(loadingToast);
-
 		try {
 			const dominant = await extractDominantColor(dataUrl);
 			applyBorder(/^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : undefined);
 		} catch {
 			applyBorder();
 		}
-
-		toast('Image uploaded!');
 	};
 
 	const onDrop = (e: DragEvent) => {
@@ -225,23 +217,10 @@
 		if (mockupStore.uploadedImage) {
 			showPasteHint = true;
 
-			toast('Image in clipboard detected!', {
-				duration: 3000,
-				action: {
-					label: 'Clear & Paste',
-					onClick: () => {
-						mockupStore.setUploadedImage(null);
-						localStorage.removeItem('demoImage');
-						setTimeout(() => uploadFile(file), 100);
-					}
-				}
-			});
-
 			setTimeout(() => (showPasteHint = false), 3000);
 		} else {
 			await uploadFile(file);
 			localStorage.removeItem('demoImage');
-			toast('Image pasted successfully!');
 		}
 	};
 
@@ -257,10 +236,8 @@
 
 			const dominant = await extractDominantColor(demoImage);
 			applyBorder(/^#[0-9A-Fa-f]{6}$/.test(dominant) ? dominant : undefined);
-			toast('Image uploaded!');
 		} catch {
 			applyBorder();
-			toast('Image uploaded!');
 		}
 	};
 </script>

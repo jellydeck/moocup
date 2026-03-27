@@ -9,7 +9,6 @@
 	import GithubLogoIcon from 'phosphor-svelte/lib/GithubLogoIcon';
 	import XLogoIcon from 'phosphor-svelte/lib/XLogoIcon';
 
-	import { toast } from 'svelte-sonner';
 	import { mockupStore } from '$lib/contexts/store.svelte';
 	import html2canvas from 'html2canvas';
 	import upiQR from '$lib/assets/upiQR.png';
