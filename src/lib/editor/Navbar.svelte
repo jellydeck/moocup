@@ -59,16 +59,11 @@
 	}
 
 	async function handleSingleExport() {
-		if (!uploadedImage) {
-			toast.error('Please upload an image first');
-			return;
-		}
 		isExporting = true;
 		try {
 			await exportImage(exportFormat, parseInt(quality));
-			toast.success(`Successfully exported as ${exportFormat}!`);
 		} catch {
-			toast.error('Failed to export image. Please try again.');
+			console.error('Failed to export image. Please try again.');
 		} finally {
 			isExporting = false;
 		}

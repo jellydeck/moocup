@@ -70,13 +70,13 @@
 
 	const handleImageUpload = (file: File) => {
 		if (!['image/jpeg', 'image/png'].includes(file.type)) {
-			toast.error('Invalid file format! Please use JPG, PNG.');
+			console.error('Invalid file format! Please use JPG, PNG.');
 			isDragOver = false;
 			isDialogOpen = false;
 			return;
 		}
 		if (file.size > MAX_FILE_SIZE) {
-			toast.error('File too large! Maximum size is 10MB.');
+			console.error('File too large! Maximum size is 10MB.');
 			isDragOver = false;
 			isDialogOpen = false;
 			return;
@@ -96,7 +96,7 @@
 			}
 		};
 		reader.onerror = () => {
-			toast.error('Failed to read the file. Please try again.');
+			console.error('Failed to read the file. Please try again.');
 			isDragOver = false;
 			isDialogOpen = false;
 		};
@@ -109,7 +109,7 @@
 		isDragOver = false;
 		const file = e.dataTransfer?.files[0];
 		if (!file) {
-			toast.error('No valid file dropped.');
+			console.error('No valid file dropped.');
 			isDialogOpen = false;
 		} else {
 			handleImageUpload(file);
@@ -119,7 +119,7 @@
 	const handleFileInput = (e: Event) => {
 		const file = (e.target as HTMLInputElement).files?.[0];
 		if (!file) {
-			toast.error('No file selected.');
+			console.error('No file selected.');
 			isDialogOpen = false;
 		} else {
 			handleImageUpload(file);
@@ -129,7 +129,6 @@
 	const handlePaste = (e: ClipboardEvent) => {
 		const file = e.clipboardData?.files[0];
 		if (!file) {
-			toast.error('No valid image pasted.');
 			isDialogOpen = false;
 		} else {
 			handleImageUpload(file);
