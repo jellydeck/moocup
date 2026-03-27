@@ -88,7 +88,7 @@
 			onmousedown={handleWindowDragStart}
 		>
 			<div class="flex items-center gap-3">
-				<DotsSixVerticalIcon size={16} weight="bold" />
+				<DotsSixVerticalIcon size={16} weight="bold" class="hidden md:block" />
 				<span class="text-lg font-semibold text-white">Rotation & Skew</span>
 			</div>
 
