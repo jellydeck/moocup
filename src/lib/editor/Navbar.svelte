@@ -14,7 +14,6 @@
 	import html2canvas from 'html2canvas';
 	import upiQR from '$lib/assets/upiQR.png';
 	import Button from '$lib/components/Button.svelte';
-	import { browser } from '$app/environment';
 
 	let exportFormat = $state('PNG');
 	let quality = $state('2');
@@ -23,8 +22,6 @@
 	let isUpiDialogOpen = $state(false);
 
 	const { uploadedImage } = $derived(mockupStore);
-
-	let isMobile = $state(browser ? window.innerWidth < 768 : false);
 
 	async function exportImage(format: string, qualityMultiplier: number) {
 		if (!uploadedImage) return;
@@ -80,9 +77,9 @@
 </script>
 
 {#snippet exportOptions()}
-	<div class={isMobile ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-6'}>
-		<!-- Controls -->
-		<div class={!isMobile ? 'order-2' : 'order-1'}>
+	<div class="flex flex-col gap-2 md:grid md:grid-cols-2 md:gap-6">
+		<!-- Controls — second on mobile, first on desktop -->
+		<div class="order-1 md:order-2">
 			<h3 class="text-foreground mb-6 flex items-center gap-2 text-xl font-semibold">
 				<DownloadSimpleIcon size={20} weight="bold" />
 				Export Options
@@ -142,7 +139,7 @@
 				</fieldset>
 			</div>
 
-			<!-- Export Buttons -->
+			<!-- Export Button -->
 			<div class="mt-10 flex justify-center">
 				<Button
 					class="flex-1"
@@ -168,10 +165,8 @@
 			</a>
 		</div>
 
-		<!-- My Letter -->
-		<div
-			class={`rounded-3xl border-2 border-dotted border-accent/70 p-5 ${!isMobile ? 'order-1' : 'order-2'} group`}
-		>
+		<!-- My Letter — first on mobile, second on desktop -->
+		<div class="group order-2 rounded-3xl border-2 border-dotted border-accent/70 p-5 md:order-1">
 			<HeartIcon
 				size={20}
 				weight="duotone"
@@ -252,14 +247,12 @@
 					Say Hi!
 					<span class="ml-2">I'm always up for quick chat :)</span>
 				</h4>
-
 				<a
 					href="https://bsky.app/profile/jaydip.me"
 					target="_blank"
 					rel="noopener noreferrer"
 					class="inline-flex items-center justify-center gap-2 rounded-md transition-colors"
 				>
-					<!-- Bluesky -->
 					<svg fill="none" viewBox="0 0 64 57" width={20} height={20} class="text-text">
 						<path
 							fill="currentColor"
@@ -305,23 +298,21 @@
 					/>
 				</a>
 			</div>
-			{#if !isMobile}
-				<div class="flex items-center gap-2 text-text">
-					<span>crafted by</span>
-					<a
-						href="https://jaydip.me"
-						target="_blank"
-						rel="noopener noreferrer"
-						class="text-sm text-white underline hover:no-underline"
-					>
-						Jaydip
-					</a>
+			<div class="hidden items-center gap-2 text-text md:flex">
+				<span>crafted by</span>
+				<a
+					href="https://jaydip.me"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-sm text-white underline hover:no-underline"
+				>
+					Jaydip
+				</a>
 
-					<div class="ml-1 flex flex-wrap rounded-md border border-border bg-accent/40 p-1">
-						<a href="https://www.jaydip.me/blog/hello-svelte"> Why redesign?</a>
-					</div>
+				<div class="ml-1 flex flex-wrap rounded-md border border-border bg-accent/40 p-1">
+					<a href="https://www.jaydip.me/blog/hello-svelte"> Why redesign?</a>
 				</div>
-			{/if}
+			</div>
 		</div>
 
 		<!-- Actions -->
@@ -335,7 +326,8 @@
 				<GithubLogoIcon size={20} weight="bold" /> Send us a star!
 			</Button>
 
-			{#if isMobile}
+			<!-- Mobile: Dialog trigger (hidden on md+) -->
+			<div class="md:hidden">
 				<Dialog.Root bind:open={isDialogOpen}>
 					<Dialog.Trigger
 						class="flex h-10 w-10 items-center justify-center rounded-md bg-bg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
@@ -365,7 +357,10 @@
 						</Dialog.Content>
 					</Dialog.Portal>
 				</Dialog.Root>
-			{:else}
+			</div>
+
+			<!-- Desktop: Popover (hidden below md) -->
+			<div class="hidden md:block">
 				<Popover.Root>
 					<Popover.Trigger>
 						{#snippet child({ props })}
@@ -394,7 +389,7 @@
 						</Popover.Content>
 					</Popover.Portal>
 				</Popover.Root>
-			{/if}
+			</div>
 		</div>
 	</div>
 </div>
