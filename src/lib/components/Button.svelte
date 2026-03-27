@@ -7,7 +7,7 @@
 	const buttonVariants = tv({
 		base: [
 			'inline-flex h-9 items-center justify-center gap-2 rounded-sm',
-			'px-4 text-[15px] font-bold no-underline transition-colors transition-transform',
+			'px-4 text-[15px] font-bold no-underline transition-[color,background-color,translate]',
 			'active:translate-y-px active:hover:inset-shadow-[0_3px_3px_0] active:inset-shadow-bg/80',
 			'focus-visible:-translate-y-1 focus-visible:shadow-[0_5px_0px_0]'
 		],
