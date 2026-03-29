@@ -73,4 +73,4 @@ Raise a PR with relevant details, and it'll be merged
 
 ## License 
 
-GNU AGPLv3
+MIT
