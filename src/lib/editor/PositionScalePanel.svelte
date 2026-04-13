@@ -183,7 +183,7 @@
 								active={activeTab === 'margins'}
 								class="flex-1 rounded-r-2xl"
 							>
-								Marings
+								Margins
 							</Button>
 						{/snippet}
 					</Tabs.Trigger>
