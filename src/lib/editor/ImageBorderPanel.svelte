@@ -13,7 +13,7 @@
 	const { onClose } = $props();
 
 	let isDragging = $state(false);
-	let windowPosition = $state({ x: 300, y: 100 });
+	let windowPosition = $state({ x: 200, y: 70 });
 	let dragStart = $state({ x: 0, y: 0 });
 	let isLoadingColor = $state(false);
 	let isMobile = $state(browser ? window.innerWidth < 768 : false);

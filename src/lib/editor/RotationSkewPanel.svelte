@@ -20,7 +20,7 @@
 
 	let windowPosition = $state({
 		x: 100,
-		y: 100
+		y: 70
 	});
 
 	let dragStart = $state({

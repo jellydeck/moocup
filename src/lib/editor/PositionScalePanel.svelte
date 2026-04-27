@@ -15,8 +15,8 @@
 
 	let isDragging = $state(false);
 	let windowPosition = $state({
-		x: 200,
-		y: 100
+		x: 150,
+		y: 70
 	});
 	let dragStart = $state({
 		x: 0,
