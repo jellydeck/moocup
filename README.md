@@ -42,6 +42,15 @@ You can easily self-host moocup on platforms like Vercel, Railway, or Netlify—
  
  - for the latest version in a single click.
 
+### One-click Easypanel Deploy
+
+[Easypanel](https://easypanel.io) is a self-hosted Docker deployment platform, and moocup has a one-click deployment template there:
+
+[![Deploy on Easypanel][easypanel-btn]][easypanel-deploy]
+
+[easypanel-btn]: https://easypanel.io/img/deploy-on-easypanel-40.svg
+[easypanel-deploy]: https://easypanel.io/templates/moocup
+
 ### Docker Image
 
 You can also run moocup using Docker from Docker Hub:
